@@ -1,12 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Recipes Document</title>
+    <title>Document</title>
 </head>
+
 <body>
-    <p>Hello World sfsdf sdfas</p>
+    <header role="heading">
+
+
+        
+
+    </header>
+    <main class="container">
+            <a href="#" class="signout nodisplay">
+                    <p>SignOut</p>
+            </a>
+        <div class="content_mainPage">
+            <h1>Welcome to Recipe Master</h1>
+            <h2></h2>
+            <div class="loginsetup ">
+                    <!-- Signin & Signup -->
+                    <a class="btn btn-primary" href="#" data-toggle="modal" data-target=".login-register-form">
+                        Login - Registration
+                    </a>
+
+                    <!-- Login / Register Modal-->
+                    <div class="modal fade login-register-form" role="dialog">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </button>
+                                    <ul class="nav nav-tabs">
+                                        <li class="active">
+                                            <a data-toggle="tab" href="#login-form"> Login
+                                                <span class="glyphicon glyphicon-user"></span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a data-toggle="tab" href="#registration-form"> Register
+                                                <span class="glyphicon glyphicon-pencil"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="tab-content">
+                                        <div id="login-form" class="tab-pane fade in active">
+                                            <form action="/login" method="post">
+                                                <div class="form-group">
+                                                    <label for="email">Email:</label>
+                                                    <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="pwd">Password:</label>
+                                                    <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pwd" required>
+                                                </div>
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="remember"> Remember me</label>
+                                                </div>
+                                                <button type="submit" class="btn btn-default">Login</button>
+                                            </form>
+                                        </div>
+                                        <div id="registration-form" class="tab-pane fade">
+                                            <form action="/" method="post">
+                                                <div class="form-group">
+                                                    <label for="name">Your Name:</label>
+                                                    <input type="text" class="form-control" id="name" placeholder="Enter your name" name="name">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="newemail">Email:</label>
+                                                    <input type="email" class="form-control" id="newemail" placeholder="Enter new email" name="newemail">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="newpwd">Password:</label>
+                                                    <input type="password" class="form-control" id="newpwd" placeholder="New password" name="newpwd">
+                                                </div>
+                                                <button type="submit" class="btn btn-default">Register</button>
+                                            </form>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--                                    <div class="modal-footer">-->
+                                <!--                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+                                <!--                                    </div>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <div class="listRecipes nodisplay">
+            <div class="listRecipes__title">
+                <h2>List of Recipes</h2>
+            </div>
+            <div class="listRecipes__content">
+
+
+            </div>
+
+        </div>
+        <div class="newRecipe nodisplay">
+            <div class="recipe__buttons">
+                <button class="recipe__buttons--back">back</button>
+                <button>save</button>
+            </div>
+            <div class="recipe__title">
+                <label for="ingredientsChooser">Title</label>
+                <input id="ingredientsChooseer" type="text">
+            </div>
+            <form class="formIngredients" action="">
+                <form action="
+                            
+                            ">
+                    <div class="formIngredients__ingredientsChooser">
+                        <label for="ingredientsChooser">Ingredients</label>
+
+
+                        <select class="js-example-basic-multiple" name="ingredients[]" multiple="multiple" style="width: 100%">
+
+                        </select>
+
+
+                    </div>
+
+                </form>
+
+                <div class="recipe__ingredientsInfo">
+
+                </div>
+
+                <div class="recipe__instructionsNew">
+                    <label for="instructions">Instructions</label>
+                    <textarea id="instructions"></textarea>
+                </div>
+
+                <div class="recipe__media">
+                    <label for="media">Media</label>
+                    <input type="file">
+                </div>
+            </form>
+        </div>
+        <div class="viewRecipe nodisplay">
+            <div class="recipe__buttons">
+                <button class="recipe__buttons--back">back</button>
+                <button class="recipe__buttons--edit">edit</button>
+                <button>save</button>
+            </div>
+            <div class="recipe__title">
+                <h3 class="recipe__title--value">Soup With chicken</h3>
+            </div>
+            <div class="recipe__ingredients" action="">
+                <p class="recipe__ingredients--title">Ingredients</p>
+                <div class="recipe__ingredients--info">
+                    <div class="recipe__ingredients--info__unity">
+                        <p class="label">Unit</p>
+                        <p class="value"></p>
+                    </div>
+                    <div class="recipe__ingredients--info__quantity">
+                        <p class="label">Quantity</p>
+                        <p class="value"></p>
+                    </div>
+                    <p class="recipe__ingredients--info__name"></p>
+                </div>
+            </div>
+            <div class="recipe__instructions">
+                <p class="label">Instructions</p>
+                <p class="value"></p>
+            </div>
+        </div>
+        <div class="editRecipe nodisplay">
+            <div class="recipe__buttons">
+                <button class="recipe__buttons--back">back</button>
+                <button>delete</button>
+                <button>save</button>
+            </div>
+            <div class="recipe__title">
+                <label for="titleChooser">Title</label>
+                <input id="titleChooser" type="text">
+            </div>
+            <form class="formIngredients" action="">
+                <form action="">
+                    <div class="formIngredients__ingredientsChooser">
+                        <label for="ingredientsChooser">Ingredients</label>
+
+
+                        <select class="js-example-basic-multiple" name="recipes[]" multiple="multiple" style="width: 100%">
+
+                        </select>
+
+                    </div>
+                </form>
+
+                <div class="recipe__ingredientsInfo">
+
+
+                </div>
+
+                <div class="recipe__instructionsEdit">
+                    <label for="recipe_instructionsEdit">Instructions</label>
+                    <textarea id="recipe_instructionsEdit" rows="4" cols="50"></textarea>
+                </div>
+
+
+
+                <div class="recipe__media">
+                    <label for="media">Media</label>
+                    <input type="file">
+                </div>
+
+
+            </form>
+        </div>
+
+        <div class="container popup nodisplay ">
+
+
+
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Choose your Unit and Quantitys</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="recipe__ingredientsInfoPopup">
+                            <p class="recipe__ingredientsInfoPopup--name">ingredient</p>
+                            <div class="recipe__ingredientsInfoPopup--qtt">
+                                <label for="servingUnity">Quantity</label>
+                                <input id="servingUnityPopup" type="text">
+                            </div>
+                            <div class="recipe__ingredientsInfoPopup--unit">
+                                <label for="servingQuantity">Unit</label>
+                                <input id="servingQuantityPopup" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="saveIngredient btn btn-default" data-dismiss="modal">Save</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Select 2-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <!-- Magnific Popup core JS file -->
+    <script src="js/jquery.magnific-popup.js"></script>
+    <script src="js/client.js"></script>
 </body>
+
 </html>

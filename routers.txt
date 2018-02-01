@@ -1,0 +1,11 @@
+/ => home
+
+/recipes => last recipes of user
+
+/login => login into app
+
+/register => register new user
+
+
+
+/user/id/recipes => 
