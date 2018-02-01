@@ -18,6 +18,7 @@ const { Recipe } = require('./models');
 
 app.use(morgan('dev'));
 app.use(cors());
+app.use(bodyParser.json());
 app.use(express.static('public'));
 
 passport.use(localStrategy);
@@ -59,7 +60,8 @@ app.get('/api/select', (req, res) => {
   
 });
 
-app.get('/recipes', (req, res) => {
+//get the last  3 recipes
+app.get('/recipes',(req, res) => {
   console.log("here");
   Recipe
     .find()
@@ -72,31 +74,78 @@ app.get('/recipes', (req, res) => {
     });
 })
 
+// get one recipe based on id
+app.get('/recipes/:id', (req, res) => {
+  Recipe
+    .findById(req.params.id)
+    .then(recipe => res.json(recipe.serialize()))
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ error: 'something went horribly awry' });
+    });
+});
 
-// app.get('/posts/:id', (req, res) => {
-//   BlogPost
-//     .findById(req.params.id)
-//     .then(post => res.json(post.serialize()))
-//     .catch(err => {
-//       console.error(err);
-//       res.status(500).json({ error: 'something went horribly awry' });
-//     });
-// });
+//new recipe
+app.post('/recipes', (req, res) => {
+  console.log(req.body);
+  const requiredFields = ['title', 'instructions', 'ingredients'];
+  for (let i = 0; i < requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      const message = `Missing \`${field}\` in request body`;
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  }
 
-// app.get('/users/:id/recipes', (req, res) => {
-//   Users
-//     .find()
-//     .then(posts => {
-//       res.json(posts.map(post => post.serialize()));
-//     })
-//     .catch(err => {
-//       console.error(err);
-//       res.status(500).json({ error: 'something went terribly wrong' });
-//     });
-// });
+  Recipe
+    .create({
+      title: req.body.title,
+      instructions: req.body.instructions,
+      ingredients: req.body.ingredients
+    })
+    .then(Recipe => res.status(201).json(Recipe.serialize()))
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ error: 'Something went wrong' });
+    });
 
+});
 
+// delete recipe
+app.delete('/recipes/:id', (req, res) => {
+  Recipe
+    .findByIdAndRemove(req.params.id)
+    .then(() => {
+      res.status(204).json({ message: 'success' });
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ error: 'something went terribly wrong' });
+    });
+});
 
+//update recipes
+app.put('/recipes/:id', (req, res) => {
+  if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
+    res.status(400).json({
+      error: 'Request path id and request body id values must match'
+    });
+  }
+
+  const updated = {};
+  const updateableFields = ['title', 'instructions', 'ingredients'];
+  updateableFields.forEach(field => {
+    if (field in req.body) {
+      updated[field] = req.body[field];
+    }
+  });
+
+  Recipe
+    .findByIdAndUpdate(req.params.id, { $set: updated }, { new: true })
+    .then(updatedRecipe => res.status(204).end())
+    .catch(err => res.status(500).json({ message: 'Something went wrong' }));
+});
 // closeServer needs access to a server object, but that only
 // gets created when `runServer` runs, so we declare `server` here
 // and then assign a value to it in run

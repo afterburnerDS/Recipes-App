@@ -10,10 +10,10 @@ const jsonParser = bodyParser.json();
 
 // Post to register a new user
 router.post('/', jsonParser, (req, res) => {
-  console.log("here");
+  console.log(req);
   const requiredFields = ['email', 'password'];
   const missingField = requiredFields.find(field => !(field in req.body));
-
+  console.log(missingField);
   if (missingField) {
     return res.status(422).json({
       code: 422,
@@ -59,9 +59,6 @@ router.post('/', jsonParser, (req, res) => {
   }
 
   const sizedFields = {
-    username: {
-      min: 1
-    },
     password: {
       min: 10,
       // bcrypt truncates after 72 characters, so let's not give the illusion
