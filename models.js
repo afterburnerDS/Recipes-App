@@ -20,15 +20,14 @@ const recipeSchema = mongoose.Schema({
 //   return `${this.author.firstName} ${this.author.lastName}`.trim();
 // });
 
-// recipeSchema.methods.serialize = function () {
-//   return {
-//     id: this._id,
-//     author: this.authorName,
-//     content: this.content,
-//     title: this.title,
-//     created: this.created
-//   };
-// };
+recipeSchema.methods.serialize = function () {
+  return {
+    id: this._id,
+    title: this.title,
+    instructions: this.instructions,
+   
+  };
+};
 
 const Recipe = mongoose.model('Recipe', recipeSchema);
 

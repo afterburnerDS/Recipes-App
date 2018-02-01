@@ -1,3 +1,4 @@
+
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
@@ -10,10 +11,20 @@ const app = express();
 const { router: usersRouter } = require('./users');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
 
+mongoose.Promise = global.Promise;
+
+const { PORT, DATABASE_URL } = require('./config');
+const { Recipe } = require('./models');
 
 app.use(morgan('dev'));
 app.use(cors());
 app.use(express.static('public'));
+
+passport.use(localStrategy);
+passport.use(jwtStrategy);
+
+app.use('/api/users/', usersRouter);
+app.use('/api/auth/', authRouter);
 
 // app.listen(process.env.PORT || 8080);
 
@@ -48,68 +59,80 @@ app.get('/api/select', (req, res) => {
   
 });
 
-api.get('/user/recipes', (req, res) => {
-
-})
-
-
-app.get('/posts/:id', (req, res) => {
-  BlogPost
-    .findById(req.params.id)
-    .then(post => res.json(post.serialize()))
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ error: 'something went horribly awry' });
-    });
-});
-
-app.get('/users/:id/recipes', (req, res) => {
-  Users
+app.get('/recipes', (req, res) => {
+  console.log("here");
+  Recipe
     .find()
-    .then(posts => {
-      res.json(posts.map(post => post.serialize()));
+    .then(recipes => {
+      res.json(recipes);
     })
     .catch(err => {
       console.error(err);
       res.status(500).json({ error: 'something went terribly wrong' });
     });
-});
+})
+
+
+// app.get('/posts/:id', (req, res) => {
+//   BlogPost
+//     .findById(req.params.id)
+//     .then(post => res.json(post.serialize()))
+//     .catch(err => {
+//       console.error(err);
+//       res.status(500).json({ error: 'something went horribly awry' });
+//     });
+// });
+
+// app.get('/users/:id/recipes', (req, res) => {
+//   Users
+//     .find()
+//     .then(posts => {
+//       res.json(posts.map(post => post.serialize()));
+//     })
+//     .catch(err => {
+//       console.error(err);
+//       res.status(500).json({ error: 'something went terribly wrong' });
+//     });
+// });
 
 
 
-// both runServer and closeServer need to access the same
-// server object, so we declare `server` here, and then when
-// runServer runs, it assigns a value.
+// closeServer needs access to a server object, but that only
+// gets created when `runServer` runs, so we declare `server` here
+// and then assign a value to it in run
 let server;
 
-// this function starts our server and returns a Promise.
-// In our test code, we need a way of asynchronously starting
-// our server, since we'll be dealing with promises there.
-function runServer() {
-  const port = process.env.PORT || 8080;
+// this function connects to our database, then starts the server
+function runServer(databaseUrl = DATABASE_URL, port = PORT) {
   return new Promise((resolve, reject) => {
-    server = app.listen(port, () => {
-      console.log(`Your app is listening on port ${port}`);
-      resolve(server);
-    }).on('error', err => {
-      reject(err)
+    mongoose.connect(databaseUrl, { useMongoClient: true }, err => {
+      if (err) {
+        return reject(err);
+      }
+      server = app.listen(port, () => {
+        console.log(`Your app is listening on port ${port}`);
+        resolve();
+      })
+        .on('error', err => {
+          mongoose.disconnect();
+          reject(err);
+        });
     });
   });
-}  
+}
 
-// like `runServer`, this function also needs to return a promise.
-// `server.close` does not return a promise on its own, so we manually
-// create one.
+// this function closes the server, and returns a promise. we'll
+// use it in our integration tests later.
 function closeServer() {
-  return new Promise((resolve, reject) => {
-    console.log('Closing server');
-    server.close(err => {
-      if (err) {
-        reject(err);
-        // so we don't also call `resolve()`
-        return;
-      }
-      resolve();
+  return mongoose.disconnect().then(() => {
+    return new Promise((resolve, reject) => {
+      console.log('Closing server');
+      server.close(err => {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+      });
     });
   });
 }
@@ -118,6 +141,6 @@ function closeServer() {
 // runs. but we also export the runServer command so other code (for instance, test code) can start the server as needed.
 if (require.main === module) {
   runServer().catch(err => console.error(err));
-};
+}
 
-module.exports = {app, runServer, closeServer};
+module.exports = { runServer, app, closeServer };
