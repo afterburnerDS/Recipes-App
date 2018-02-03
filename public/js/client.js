@@ -36,17 +36,84 @@ const mockRecipes = [{
     },
 ]
 
+const currentPage = $('.newRecipe');
 let ingredients = ["banana", "tomato"];
 
-function handleBack() {
+function handleBack(data) {
     // comes back to current list of recipes of user
     $('.recipe__buttons--back').on('click', function (event) {
         console.log("back");
-        showListRecipes();
+        showListRecipes(data);
     });
 }
 
 function handleSaveRecipe() {
+   
+    $(".recipe__buttons--save").on("click", function (event) {
+
+        //validate user information
+        const title = $('#ingredientsChooseer').val();
+        const instructions = $('#instructions').val();
+
+        //get all ingredients
+
+        const ingredients = [];
+        // console.log($('recipe__ingredientsInfo'));
+
+        $('.recipe__ingredientsInfo--ingredient').each(function(i, ingredient) {
+            let ingredientObj = {
+                name : $(ingredient).children('.nameIngredient').text(),
+                quantity:$(ingredient).children().children('#servingQuantity').val(),
+                unitIngredient: $(ingredient).children().children('#servingUnity').val()
+            };
+
+            console.log($(ingredient));
+            
+            let itHasIngredient = ingredients.find(ingredient => {
+                return ingredient.name === ingredientObj.name;
+            })
+
+            if(!itHasIngredient){
+                ingredients.push(ingredientObj);
+            }
+
+            
+            
+        });
+        
+        console.log(title + instructions);
+        console.log(ingredients);
+        
+        
+        //creates token for the user
+            $.ajax({
+                type: 'POST',
+                url: `http://localhost:3000/recipes`,
+              
+                beforeSend: function (xhr) {
+                    if (localStorage.token) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
+                    }
+                },
+                data: JSON.stringify({
+                    title: title,
+                    instructions: instructions,
+                    ingredients: ingredients
+                }),
+                success: function (data) {
+                    //show a popup saying saved
+                    
+                   
+                },
+                error: function (data) {
+                    
+                }
+                
+            });
+
+       
+        event.preventDefault();
+    })
 
 }
 
@@ -107,24 +174,30 @@ function renderRecipeListIngredients(elem) {
 function renderRecipeListIngredientsEdit(elem) {
     return ` <div class="recipe__ingredientsInfo--ingredient">
     <button class="recipeDelete">X</button>
-    <p>${elem.name}</p>
+    <p class="nameIngredient">${elem.name}</p>
     <div class="recipe__ingredientsInfo--qtt">
-        <label for="servingUnity">Quantity</label>
-        <input id="servingUnity" type="text" value="${elem.quantity}">
+        <label for="servingQuantity">Quantity</label>
+        <input id="servingQuantity" type="text" value="${elem.quantity}">
     </div>
     <div class="recipe__ingredientsInfo--unit">
-        <label for="servingQuantity">Unit</label>
-        <input id="servingQuantity" value ="${elem.unit}"type="text">
+        <label for="servingUnity">Unit</label>
+        <input id="servingUnity" value ="${elem.unit}"type="text">
     </div>
 </div>`
 
 }
 
-function showViewRecipe(target) {
+function showViewRecipe(data, id) {
     //find the object
-    let recipeToRender = mockRecipes.find(recipe => {
-        return recipe.title === target
+
+    
+    let recipeToRender = data.find(recipe => {
+        return recipe._id === id;
     })
+
+    console.log(recipeToRender);
+
+    
     //unload other pages
     $('.content_mainPage').addClass("nodisplay");
     $('.newRecipe').addClass("nodisplay");
@@ -145,27 +218,39 @@ function showViewRecipe(target) {
     });
 
     $('.recipe__ingredients--info').html(recipeIngredientsArray.join(""));
-    handleBack();
+    handleBack(data);
     handleSignout();
     handleDeleteRecipe(recipeToRender);
     handleEditRecipe(recipeToRender);
 }
 
 
-function handleClickRecipe() {
+function handleClickRecipe(data) {
 
     //serve page of recipe
     $(".recipeContainer").on("click", function (event) {
         //get the id of the recipe
-        let target = $(event.target).closest("a.recipeContainer").children().children("div.recipeContainer__resume--title").children().text();
+
+        let id = "";
+        
+
+        // console.log();
+
+        if($(event.target).attr("class") ==="recipeContainer__resume" ){
+            id= $(event.target).attr("data-recipeId");
+        }else{
+            id = $(event.target).parents(".recipeContainer__resume").attr("data-recipeId");
+        }
+
+        console.log(data);
 
         //populate recipe fields
-        showViewRecipe(target);
+        showViewRecipe(data,id);
     })
 }
 
 function renderRecipeListRecipes(elem, index) {
-
+    console.log(elem);
     let ingredients = elem.ingredients.map(ingredient => {
 
         return ingredient.name;
@@ -174,7 +259,7 @@ function renderRecipeListRecipes(elem, index) {
 
     return `<a class="recipeContainer">
 
-    <div class="recipeContainer__resume">
+    <div class="recipeContainer__resume" data-recipeId="${elem._id}">
         <div class="recipeContainer__resume--title">
             <h3 class="title">${elem.title}</h3>
         </div>
@@ -199,16 +284,16 @@ function renderRecipeListRecipes(elem, index) {
 </a>`;
 }
 
-function generateListRecipes() {
+function generateListRecipes(data) {
     console.log("aqui");
-    let items = mockRecipes.map(function (elem, index) {
+    let items = data.map(function (elem, index) {
         return renderRecipeListRecipes(elem, index);
 
     });
     return items.join("");
 }
 
-function showListRecipes() {
+function showListRecipes(data) {
     console.log("auqi");
     //Show list of reipes
     // insert that HTML into the DOM
@@ -228,7 +313,7 @@ function showListRecipes() {
     $('.viewRecipe').addClass("nodisplay");
     $('.editRecipe').addClass("nodisplay");
     $('.listRecipes').removeClass("nodisplay");
-    let recipesString = generateListRecipes();
+    let recipesString = generateListRecipes(data);
     let recipeNew = ` <a class="listRecipes__new">
            
     <p class="listRecipes__new--text">Add New Recipe</p>
@@ -236,8 +321,7 @@ function showListRecipes() {
     let recipesFinal = recipesString.concat(recipeNew);
     $('.listRecipes__content').html(recipesFinal);
 
-    console.log("aqui");
-    handleClickRecipe();
+    handleClickRecipe(data);
     handleSignout();
     handleNewRecipe();
 }
@@ -251,11 +335,10 @@ function handleDeleteIngredient() {
 }
 
 function handleNewIngredients() {
-
+    $('.js-example-basic-multiple').off('select2:select');
     $('.js-example-basic-multiple').on('select2:select', function (e) {
         //get the param text chosen
         let data = e.params.data.text;
-        console.log(data);
         //clear the selection
         $('.js-example-basic-multiple').val('').trigger('change')
         //populate the modal with the name of the ingredient
@@ -266,27 +349,41 @@ function handleNewIngredients() {
         $('.saveIngredient').off('click');
         $('.saveIngredient').on('click', event => {
             //get the qtt, unit
+            console.log("save click");
             let qtt = $('#servingUnityPopup').val();
             let unit = $('#servingQuantityPopup').val();
 
-            let ingredientToBeRendered = `<div class="recipe__ingredientsInfo--ingredient">
+            let ingredientToBeRendered = `
+            
+     <div class="recipe__ingredientsInfo--ingredient">
           <button class="recipeDelete">X</button>
-          <p>${data}</p>
-          <div class="recipe__ingredientsInfo--qtt">
-              <label for="servingUnity">Quantity</label>
-              <input id="servingUnity" type="text" value="${qtt}">
+          <p class="nameIngredient">${data}</p>
+          <div class="recipe__qtt">
+              <label for="servingQuantity">Quantity</label>
+              <input id="servingQuantity" type="text" value="${qtt}">
           </div>
-          <div class="recipe__ingredientsInfo--unit">
-              <label for="servingQuantity">Unit</label>
-              <input id="servingQuantity" value ="${unit}" type="text">
+          <div class="recipe__unit">
+              <label for="servingUnity">Unit</label>
+              <input id="servingUnity" value ="${unit}" type="text">
           </div>
       </div>`;
 
-            console.log(ingredientToBeRendered);
+            
 
-            $('.recipe__ingredientsInfo').append(ingredientToBeRendered);
-            handleDeleteIngredient();
+            // currentPage.find('.recipe__ingredientsInfoNew').append(ingredientToBeRendered);
+
+            $('.recipe__ingredientsInfoNew', currentPage).append(ingredientToBeRendered);
+
+
+            $('.recipe__ingredientsInfo--ingredient').each(function(i, ingredient) {
+              console.log(ingredient);
+            });
+
+            // console.log($('.recipe__ingredientsInfo--ingredient'));
+
+           handleDeleteIngredient();
         })
+        
     })
 }
 
@@ -296,12 +393,14 @@ function handleNewRecipe() {
         $('.listRecipes').addClass("nodisplay");
 
         $('.newRecipe').removeClass("nodisplay");
-        handleBack();
+        
+
+    });
+
+    handleBack();
         handleSignout();
         handleSaveRecipe();
         handleNewIngredients();
-
-    });
 }
 
 function handleLogin() {
@@ -311,68 +410,69 @@ function handleLogin() {
     $("#login-form").on("submit", function (event) {
 
         //validate user information
-        // const email = $('#email').val();
-        // const pwd = $('#pwd').val();
+        const email = $('#email').val();
+        const pwd = $('#pwd').val();
+        console.log(email + pwd);
+        //creates token for the user
+        $.ajax(
 
-        // //creates token for the user
-        // $.ajax(
+            {
+                type: "post",
+                beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", "application/json");
+                },
+                url: "http://localhost:3000/api/auth/login",
+                // email: email,
+                // pwd: pwd,
 
-        //     {
-        //         type: "post",
-        //         url: "/login",
-        //         email: email,
-        //         pwd: pwd,
+                data: JSON.stringify({
+                    email: email,
+                    password: pwd
+                }),
 
-        //         data: {
-        //             email: email,
-        //             password: pwd
-        //         },
+                //saves it in localstorage
+                success: function (data) {
+                    localStorage.token = data.authToken;
+                    // alert('Got a token from the server! Token: ' + data.authToken);
+                },
+                error: function (data) {
+                    // alert("Login Failed");
+                }
+            }
 
-        //         //saves it in localstorage
-        //         success: function (data) {
-        //             localStorage.token = data.token;
-        //             alert('Got a token from the server! Token: ' + data.token);
-        //         },
-        //         error: function (data) {
-        //             alert("Login Failed");
-        //         }
-        //     }
+        ).then(data => {
 
-        // ).then(data => {
+            console.log(data);
+            // bring the recipes from the user
+            $.ajax({
+                type: 'GET',
+                url: `http://localhost:3000/recipes/`,
+                beforeSend: function (xhr) {
+                    if (localStorage.token) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
+                    }
+                },
+                success: function (data) {
 
-        //     $.ajax({
-        //         type: 'GET',
-        //         url: '/user/:id/recipes',
-        //         beforeSend: function (xhr) {
-        //             if (localStorage.token) {
-        //                 xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
-        //             }
-        //         },
-        //         success: function (data) {
-        //             alert('Hello ' + data.name + '! You have successfully accessed to /api/profile.');
-        //         },
-        //         error: function () {
-        //             alert("Sorry, you are not logged in.");
-        //         }
-        //     });
+                    // bring the recipes from the user
+                    $('.login-register-form').modal('hide');
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                    // show his list of recipes
+                    showListRecipes(data);
+                    $('.signout').removeClass("nodisplay");
 
-        // }).then(data => {
 
-        
-        // })
+                    // alert('Hello ' + data.name + '! You have successfully accessed to /api/profile.');
+                },
+                error: function () {
+                    alert("Sorry, you are not logged in.");
+                }
+            });
+
+        })
 
         event.preventDefault();
-        $('.login-register-form').modal('hide');
-        $('body').removeClass('modal-open');
-        $('.modal-backdrop').remove();
-        // show his list of recipes
-        showListRecipes();
-        $('.signout').removeClass("nodisplay");
-
-
-
-        
-
     })
 
 

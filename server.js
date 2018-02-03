@@ -6,6 +6,7 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const passport = require('passport');
+const { Strategy: LocalStrategy } = require('passport-local');
 const app = express();
 
 const { router: usersRouter } = require('./users');
@@ -21,8 +22,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-passport.use(localStrategy);
+// passport.use(localStrategy);
 passport.use(jwtStrategy);
+
+passport.use(localStrategy);
 
 app.use('/api/users/', usersRouter);
 app.use('/api/auth/', authRouter);
@@ -61,10 +64,13 @@ app.get('/api/select', (req, res) => {
 });
 
 //get the last  3 recipes
-app.get('/recipes',(req, res) => {
+
+app.get('/recipes',passport.authenticate('jwt',{session: false}), (req, res) => {
   console.log("here");
   Recipe
-    .find()
+    .find({
+      author: req.user
+    })
     .then(recipes => {
       res.json(recipes);
     })
@@ -86,7 +92,7 @@ app.get('/recipes/:id', (req, res) => {
 });
 
 //new recipe
-app.post('/recipes', (req, res) => {
+app.post('/recipes',passport.authenticate('jwt',{session: false}), (req, res) => {
   console.log(req.body);
   const requiredFields = ['title', 'instructions', 'ingredients'];
   for (let i = 0; i < requiredFields.length; i++) {
@@ -102,7 +108,9 @@ app.post('/recipes', (req, res) => {
     .create({
       title: req.body.title,
       instructions: req.body.instructions,
-      ingredients: req.body.ingredients
+      ingredients: req.body.ingredients,
+      author: req.user
+
     })
     .then(Recipe => res.status(201).json(Recipe.serialize()))
     .catch(err => {
@@ -113,7 +121,7 @@ app.post('/recipes', (req, res) => {
 });
 
 // delete recipe
-app.delete('/recipes/:id', (req, res) => {
+app.delete('/recipes/:id',passport.authenticate('jwt',{session: false}), (req, res) => {
   Recipe
     .findByIdAndRemove(req.params.id)
     .then(() => {
@@ -126,7 +134,7 @@ app.delete('/recipes/:id', (req, res) => {
 });
 
 //update recipes
-app.put('/recipes/:id', (req, res) => {
+app.put('/recipes/:id',passport.authenticate('jwt',{session: false}), (req, res) => {
   if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
     res.status(400).json({
       error: 'Request path id and request body id values must match'

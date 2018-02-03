@@ -8,7 +8,10 @@ const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const { User } = require('../users/models');
 const { JWT_SECRET } = require('../config');
 
-const localStrategy = new LocalStrategy((email, password, callback) => {
+const localStrategy = new LocalStrategy({
+  usernameField : 'email'
+},( email, password, callback) => {
+  console.log("here");
   let user;
   User.findOne({ email: email })
     .then(_user => {
@@ -50,8 +53,17 @@ const jwtStrategy = new JwtStrategy(
     algorithms: ['HS256']
   },
   (payload, done) => {
-    done(null, payload.user);
-  }
-);
+    User.findById(payload.user.id)
+    .then(
+        user => {
+          done(null,user);
+        }
+    ).catch(
+      err => {
+        done(err);
+      }
+  )
+}
+)
 
 module.exports = { localStrategy, jwtStrategy };
