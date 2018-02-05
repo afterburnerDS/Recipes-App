@@ -1,4 +1,3 @@
-
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
@@ -6,16 +5,29 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const passport = require('passport');
-const { Strategy: LocalStrategy } = require('passport-local');
+const {
+  Strategy: LocalStrategy
+} = require('passport-local');
 const app = express();
 
-const { router: usersRouter } = require('./users');
-const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
+const {
+  router: usersRouter
+} = require('./users');
+const {
+  router: authRouter,
+  localStrategy,
+  jwtStrategy
+} = require('./auth');
 
 mongoose.Promise = global.Promise;
 
-const { PORT, DATABASE_URL } = require('./config');
-const { Recipe } = require('./models');
+const {
+  PORT,
+  DATABASE_URL
+} = require('./config');
+const {
+  Recipe
+} = require('./models');
 
 app.use(morgan('dev'));
 app.use(cors());
@@ -33,13 +45,13 @@ app.use('/api/auth/', authRouter);
 // app.listen(process.env.PORT || 8080);
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/views/index.html');
-  });
+  res.sendFile(__dirname + '/views/index.html');
+});
 
 app.get('/api/select', (req, res) => {
   const term = req.query.term;
-  axios.get("https://trackapi.nutritionix.com/v2/search/instant",
-  {params: {
+  axios.get("https://trackapi.nutritionix.com/v2/search/instant", {
+    params: {
       query: term,
     },
     headers: {
@@ -47,25 +59,29 @@ app.get('/api/select', (req, res) => {
       'x-app-key': '72b4d04544a268da7ec4249b07cd1548'
     },
 
-}).then(response => {
+  }).then(response => {
     console.log(response.data.common[0].photo);
-    res.json({results: response.data.common.map(ingredient =>( {
-      id: ingredient.tag_id,
-      text: ingredient.food_name
-    }))});
-} ).catch(
-  err => {
-    console.log(err);
-    res.sendStatus(500);
-  }
-)
+    res.json({
+      results: response.data.common.map(ingredient => ({
+        id: ingredient.tag_id,
+        text: ingredient.food_name
+      }))
+    });
+  }).catch(
+    err => {
+      console.log(err);
+      res.sendStatus(500);
+    }
+  )
   console.log(req.query);
-  
+
 });
 
-//get the last  3 recipes
+//get the last 3 recipes
 
-app.get('/recipes',passport.authenticate('jwt',{session: false}), (req, res) => {
+app.get('/recipes', passport.authenticate('jwt', {
+  session: false
+}), (req, res) => {
   console.log("here");
   Recipe
     .find({
@@ -76,7 +92,9 @@ app.get('/recipes',passport.authenticate('jwt',{session: false}), (req, res) => 
     })
     .catch(err => {
       console.error(err);
-      res.status(500).json({ error: 'something went terribly wrong' });
+      res.status(500).json({
+        error: 'something went terribly wrong'
+      });
     });
 })
 
@@ -87,12 +105,16 @@ app.get('/recipes/:id', (req, res) => {
     .then(recipe => res.json(recipe.serialize()))
     .catch(err => {
       console.error(err);
-      res.status(500).json({ error: 'something went horribly awry' });
+      res.status(500).json({
+        error: 'something went horribly awry'
+      });
     });
 });
 
 //new recipe
-app.post('/recipes',passport.authenticate('jwt',{session: false}), (req, res) => {
+app.post('/recipes', passport.authenticate('jwt', {
+  session: false
+}), (req, res) => {
   console.log(req.body);
   const requiredFields = ['title', 'instructions', 'ingredients'];
   for (let i = 0; i < requiredFields.length; i++) {
@@ -115,26 +137,69 @@ app.post('/recipes',passport.authenticate('jwt',{session: false}), (req, res) =>
     .then(Recipe => res.status(201).json(Recipe.serialize()))
     .catch(err => {
       console.error(err);
-      res.status(500).json({ error: 'Something went wrong' });
+      res.status(500).json({
+        error: 'Something went wrong'
+      });
     });
 
 });
 
 // delete recipe
-app.delete('/recipes/:id',passport.authenticate('jwt',{session: false}), (req, res) => {
+app.delete('/recipes/:id', passport.authenticate('jwt', {
+  session: false
+}), (req, res) => {
+
+
+  // Recipe
+  //         .findByIdAndRemove(req.params.id)
+  //         .then(() => {
+  //           res.status(204).json({
+  //             message: 'success'
+  //           });
+  //         })
+  //         .catch(err => {
+  //           console.error(err);
+  //           res.status(500).json({
+  //             error: 'something went terribly wrong'
+  //           });
+  //         });
+
   Recipe
-    .findByIdAndRemove(req.params.id)
-    .then(() => {
-      res.status(204).json({ message: 'success' });
+    .findById(req.params.id)
+    .then(recipe => {
+      console.log(recipe.author);
+      console.log(req.user._id);
+      // console.log(Recipe);
+
+
+      if (recipe.author.toString() === req.user._id.toString()) {
+
+        Recipe
+          .findByIdAndRemove(req.params.id)
+          .then(() => {
+            res.status(204).json({
+              message: 'success'
+            });
+          })
+          .catch(err => {
+            console.error(err);
+            res.status(500).json({
+              error: 'something went terribly wrong'
+            });
+          });
+      } else {
+        res.status(401).json({
+          message: "no authorization"
+        })
+      }
     })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ error: 'something went terribly wrong' });
-    });
+
 });
 
 //update recipes
-app.put('/recipes/:id',passport.authenticate('jwt',{session: false}), (req, res) => {
+app.put('/recipes/:id', passport.authenticate('jwt', {
+  session: false
+}), (req, res) => {
   if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
     res.status(400).json({
       error: 'Request path id and request body id values must match'
@@ -150,9 +215,31 @@ app.put('/recipes/:id',passport.authenticate('jwt',{session: false}), (req, res)
   });
 
   Recipe
-    .findByIdAndUpdate(req.params.id, { $set: updated }, { new: true })
-    .then(updatedRecipe => res.status(204).end())
-    .catch(err => res.status(500).json({ message: 'Something went wrong' }));
+    .findById(req.params.id)
+    .then(recipe => {
+      console.log(recipe.author);
+      console.log(req.user._id);
+      // console.log(Recipe);
+
+
+      if (recipe.author.toString() === req.user._id.toString()) {
+
+        Recipe
+          .findByIdAndUpdate(req.params.id, {
+            $set: updated
+          }, {
+            new: true
+          })
+          .then(updatedRecipe => res.status(204).end())
+          .catch(err => res.status(500).json({
+            message: 'Something went wrong'
+          }));
+      } else {
+        console.log("nop");
+      }
+    })
+
+
 });
 // closeServer needs access to a server object, but that only
 // gets created when `runServer` runs, so we declare `server` here
@@ -162,14 +249,16 @@ let server;
 // this function connects to our database, then starts the server
 function runServer(databaseUrl = DATABASE_URL, port = PORT) {
   return new Promise((resolve, reject) => {
-    mongoose.connect(databaseUrl, { useMongoClient: true }, err => {
+    mongoose.connect(databaseUrl, {
+      useMongoClient: true
+    }, err => {
       if (err) {
         return reject(err);
       }
       server = app.listen(port, () => {
-        console.log(`Your app is listening on port ${port}`);
-        resolve();
-      })
+          console.log(`Your app is listening on port ${port}`);
+          resolve();
+        })
         .on('error', err => {
           mongoose.disconnect();
           reject(err);
@@ -200,4 +289,8 @@ if (require.main === module) {
   runServer().catch(err => console.error(err));
 }
 
-module.exports = { runServer, app, closeServer };
+module.exports = {
+  runServer,
+  app,
+  closeServer
+};

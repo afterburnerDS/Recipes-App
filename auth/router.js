@@ -35,4 +35,4 @@ router.post('/login', localAuth, (req, res) => {
 //   res.json({authToken});
 // });
 
-module.exports = {router};
+module.exports = {router, createAuthToken};

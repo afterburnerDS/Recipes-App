@@ -79,11 +79,11 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="newemail">Email:</label>
-                                                    <input type="email" class="form-control" id="newemail" placeholder="Enter new email" name="newemail">
+                                                    <input type="email" class="form-control" id="newemail" placeholder="Enter new email" name="newemail" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="newpwd">Password:</label>
-                                                    <input type="password" class="form-control" id="newpwd" placeholder="New password" name="newpwd">
+                                                    <input type="password" class="form-control" id="newpwd" placeholder="New password" name="newpwd" required>
                                                 </div>
                                                 <button type="submit" class="btn btn-default">Register</button>
                                             </form>
@@ -116,7 +116,7 @@
             </div>
             <div class="recipe__title">
                 <label for="ingredientsChooser">Title</label>
-                <input id="ingredientsChooseer" type="text">
+                <input class="ingredientsChooseer" id="ingredientsChooseer" type="text">
             </div>
             <form class="formIngredients" action="">
                 <form action="
@@ -135,14 +135,14 @@
 
                 </form>
 
-                <div class="recipe__ingredientsInfoNew">
+                <div class="recipe__ingredientsInfo">
 
 
                 </div>
 
                 <div class="recipe__instructionsNew">
                     <label for="instructions">Instructions</label>
-                    <textarea id="instructions"></textarea>
+                    <textarea class="instructions" id="instructions"></textarea>
                 </div>
 
                 <div class="recipe__media">
@@ -155,7 +155,7 @@
             <div class="recipe__buttons">
                 <button class="recipe__buttons--back">back</button>
                 <button class="recipe__buttons--edit">edit</button>
-                <button>save</button>
+                <button class="recipe__buttons--delete">delete</button>
             </div>
             <div class="recipe__title">
                 <h3 class="recipe__title--value">Soup With chicken</h3>
@@ -187,7 +187,7 @@
             </div>
             <div class="recipe__title">
                 <label for="titleChooser">Title</label>
-                <input id="titleChooser" type="text">
+                <input class="ingredientsChooseer" id="titleChooser" type="text">
             </div>
             <form class="formIngredients" action="">
                 <form action="">
@@ -209,7 +209,7 @@
 
                 <div class="recipe__instructionsEdit">
                     <label for="recipe_instructionsEdit">Instructions</label>
-                    <textarea id="recipe_instructionsEdit" rows="4" cols="50"></textarea>
+                    <textarea class="instructions" id="recipe_instructionsEdit" rows="4" cols="50"></textarea>
                 </div>
 
 
