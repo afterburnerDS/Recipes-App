@@ -3,7 +3,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 const faker = require('faker');
-const createAuthToken = require('../auth/router');
+const { createAuthToken } = require('../auth/router');
 
 // this makes the should syntax available throughout
 // this module
@@ -44,7 +44,7 @@ function tearDownDb() {
 // we use the Faker library to automatically
 // generate placeholder values for author, title, content
 // and then we insert that data into mongo
-function seedRecipeData() {
+function seedRecipeData(user) {
   console.info('seeding recipes data');
   const seedData = [];
   for (let i = 1; i <= 10; i++) {
@@ -63,11 +63,11 @@ function seedRecipeData() {
         unit: faker.lorem.word()
       },
     ],
-      author: faker.random.alphaNumeric()
+      author: user
     });
   }
   // this will return a promise
-  return Recipes.insertMany(seedData);
+  return Recipe.insertMany(seedData);
 }
 
 function seedUserData() {
@@ -75,8 +75,8 @@ function seedUserData() {
   const seedData = [];
   for (let i = 1; i <= 10; i++) {
     seedData.push({
-      name: faker.lorem.sentence(),
-     email: faker.lorem.word(),
+      name: faker.name.findName(),
+     email: faker.internet.email(),
      password: faker.lorem.sentence(),
     });
   }
@@ -91,7 +91,12 @@ describe('test recipes APP resource', function () {
   });
 
   beforeEach(function () {
-    return seedRecipeData();
+    return seedUserData().then(users => {
+      return seedRecipeData(users[0]);
+    }).then(recipes => {
+      console.log(recipes);
+    })
+    
   });
 
   afterEach(function () {
@@ -103,10 +108,11 @@ describe('test recipes APP resource', function () {
   after(function () {
     return closeServer();
   })
+
   let res;
 
   describe('POST login', function(){
-    const password = fake.lorem.sentence();
+    const password = faker.lorem.sentence();
     return User.create (
       {
         name: faker.lorem.sentence(),
@@ -133,7 +139,7 @@ describe('test recipes APP resource', function () {
     const newUser = {
       name: faker.lorem.sentence(),
       email: faker.lorem.word(),
-      password: fake.lorem.sentence(),
+      password: faker.lorem.sentence(),
       };
 
       return chai.request(app)
@@ -157,14 +163,11 @@ describe('test recipes APP resource', function () {
           user.email.should.equal(newUser.email);
           
         });
-      
-  
-
   })
 
   describe('GET recipes from user endpoint', function () {
 
-    it('should return all existing posts', function () {
+    it.only('should return all existing recipes', function () {
       // strategy:
       //    1. get back all posts returned by by GET request to `/posts`
       //    2. prove res has right status, data type
@@ -174,7 +177,9 @@ describe('test recipes APP resource', function () {
       let token;
       return User.findOne()
       .then(user => {
+     
         token = createAuthToken(user);
+       
         return chai.request(app)
         .get('/recipes')
         .set('Authorization',`Bearer ${token}`)
@@ -232,6 +237,7 @@ describe('test recipes APP resource', function () {
         });
     });
   });
+  });
 
   describe('POST endpoint', function () {
     // strategy: make a POST request with data,
@@ -284,7 +290,7 @@ describe('test recipes APP resource', function () {
         });
     });
   });
-});
+})
 
   describe('PUT endpoint', function () {
 
@@ -366,7 +372,7 @@ describe('DELETE endpoint', function () {
   });
 });
 
-  
+});
 
       it('should return 200 and return index.html', function() {
         // for Mocha tests, when we're dealing with asynchronous operations,
@@ -380,5 +386,5 @@ describe('DELETE endpoint', function () {
             
           });
       });
-  });
+ 
 

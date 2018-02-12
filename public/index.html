@@ -4,27 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <link href="js/google-code-prettify/prettify.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
 
 <body>
-    <header role="heading">
-
-
-        
-
-    </header>
     <main class="container">
-            <a href="#" class="signout nodisplay">
+            <a href="#" class="signout button__admin nodisplay">
                     <p>SignOut</p>
             </a>
         <div class="content_mainPage">
             <h1>Welcome to Recipe Master</h1>
-            <h2></h2>
             <div class="loginsetup ">
                     <!-- Signin & Signup -->
                     <a class="btn btn-primary" href="#" data-toggle="modal" data-target=".login-register-form">
@@ -54,8 +51,11 @@
                                 </div>
                                 <div class="modal-body">
                                     <div class="tab-content">
+                                            
                                         <div id="login-form" class="tab-pane fade in active">
+                                               
                                             <form action="/login" method="post">
+                                                <p class="nonExistingUser nodisplay">Password or Email Incorrect !</p>
                                                 <div class="form-group">
                                                     <label for="email">Email:</label>
                                                     <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" required>
@@ -72,7 +72,9 @@
                                             </form>
                                         </div>
                                         <div id="registration-form" class="tab-pane fade">
+                                                
                                             <form action="/" method="post">
+                                                <p class="alreadyRegisteredUser">User already registered!</p>
                                                 <div class="form-group">
                                                     <label for="name">Your Name:</label>
                                                     <input type="text" class="form-control" id="name" placeholder="Enter your name" name="name">
@@ -103,21 +105,53 @@
             <div class="listRecipes__title">
                 <h2>List of Recipes</h2>
             </div>
-            <div class="listRecipes__content">
+            <div class="listRecipes__main">
+                <div class="listRecipes__sidebarFilter">
+                    
+                    <div class="listRecipes__sidebarFilter--filterbyIng">
+                        <label for="js-example-basic-single-filterbyIng
+                        ">Filter by Ingredient</label>
 
+                        <select id="js-example-basic-multiple-filterbyIng" name="states[]" multiple="multiple">
+                                
+                              </select>
 
+                    </div>
+
+                    <div class="listRecipes__sidebarFilter--filterbyIng">
+                            <label for="js-example-basic-single-filterbyTag
+                            ">Filter by Tag</label>
+                            <select id="js-example-basic-multiple-filterbyTag" name="states[]" multiple="multiple">
+                                   
+                            </select>
+                        </div>
+                </div>
+                <div class="listRecipes__content">
+    
+    
+                </div>
             </div>
+          
 
         </div>
         <div class="newRecipe nodisplay">
             <div class="recipe__buttons">
-                <button class="recipe__buttons--back">back</button>
-                <button class="recipe__buttons--save" >save</button>
+                <a href="#" class="button recipe__buttons--back">back</a>
+                <a href="#" class="button recipe__buttons--save" >save</a>
             </div>
             <div class="recipe__title">
-                <label for="ingredientsChooser">Title</label>
-                <input class="ingredientsChooseer" id="ingredientsChooseer" type="text">
+                <label for="recipe__title--input">Title</label>
+                <input class="recipe__title--input" id="recipe__title--input" type="text">
             </div>
+            <div class="recipe__description">
+                <label for="recipe__description--input">Description</label>
+                <textarea class="recipe__description--input" id="recipe__description--input" type="text"></textarea>
+            </div>
+
+            <div class="recipe__thumb">
+                    <label for="recipe__thumb--input">Thumbnail Picture (URL)</label>
+                    <input class="recipe__thumb--input" id="recipe__thumb--input" type="text">
+                </div>
             <form class="formIngredients" action="">
                 <form action="
                             
@@ -136,66 +170,87 @@
                 </form>
 
                 <div class="recipe__ingredientsInfo">
-
+                    
 
                 </div>
 
-                <div class="recipe__instructionsNew">
+                <div class="recipe__instructions">
                     <label for="instructions">Instructions</label>
                     <textarea class="instructions" id="instructions"></textarea>
                 </div>
 
-                <div class="recipe__media">
-                    <label for="media">Media</label>
-                    <input type="file">
-                </div>
+    
+                    <div class="recipe__tags">
+                        <label for="js-example-basic-multiple-tags">Tags</label>
+                        <select class="js-example-basic-multiple-tags" name="tags[]" multiple="multiple" id="js-example-basic-multiple-tags" style="width: 100%">  </select>
+                    </div>
+
+                
+
+                
             </form>
         </div>
         <div class="viewRecipe nodisplay">
             <div class="recipe__buttons">
-                <button class="recipe__buttons--back">back</button>
-                <button class="recipe__buttons--edit">edit</button>
-                <button class="recipe__buttons--delete">delete</button>
+                <a href="#" class="button recipe__buttons--back">back</a>
+                <a href="#" class="button recipe__buttons--edit">edit</a>
+                <a href="#" class="button recipe__buttons--delete">delete</a>
             </div>
-            <div class="recipe__title">
-                <h3 class="recipe__title--value">Soup With chicken</h3>
+            <div class="recipe__titleView">
+                <h3 class="recipe__titleView--value">Soup With chicken</h3>
             </div>
-            <div class="recipe__ingredients" action="">
-                <p class="recipe__ingredients--title">Ingredients</p>
-                <div class="recipe__ingredients--info">
-                    <div class="recipe__ingredients--info__unity">
-                        <p class="label">Unit</p>
-                        <p class="value"></p>
-                    </div>
-                    <div class="recipe__ingredients--info__quantity">
-                        <p class="label">Quantity</p>
-                        <p class="value"></p>
-                    </div>
-                    <p class="recipe__ingredients--info__name"></p>
+
+            <div class="recipe__tagsView">
+
+            </div>
+
+            <div class="recipe__descriptionView">
+                 <p class="recipe__descriptionView--desc">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus exercitationem quae quas voluptatem repellendus laborum doloremque consequatur ducimus minus voluptatum.</p>
+            </div>
+
+            
+            <div class="recipe__ingredientsView" action="">
+                <p class="recipe__ingredientsView--title">Ingredients</p>
+                <div class="recipe__ingredientsView--info">
+                    
+                   
                 </div>
             </div>
-            <div class="recipe__instructions">
-                <p class="label">Instructions</p>
-                <p class="value"></p>
+            <div class="recipe__instructionsView">
+                    <p class="recipe__instructionsView--title">Instructions</p>
+                <div class="recipe__instructionsView--content">
+                       
+
+                </div>
             </div>
         </div>
         <div class="editRecipe nodisplay">
             <div class="recipe__buttons">
-                <button class="recipe__buttons--back">back</button>
-                <button class="recipe__buttons--delete">delete</button>
-                <button class="recipe__buttons--save">save</button>
+                <a href="#" class="button recipe__buttons--backEdit">back</a>
+                <a href="#" class="button recipe__buttons--save">save</a>
+                <a href="#" class="button recipe__buttons--delete">delete</a>
             </div>
             <div class="recipe__title">
-                <label for="titleChooser">Title</label>
-                <input class="ingredientsChooseer" id="titleChooser" type="text">
+                <label for="recipe__title--input">Title</label>
+                <input class="recipe__title--input" id="recipe__title--inputEdit" type="text">
             </div>
+            <div class="recipe__description">
+                    <label for="recipe__description--inputEdit">Description</label>
+                    <textarea class="recipe__description--input" id="recipe__description--inputEdit" type="text"></textarea>
+                </div>
+
+                <div class="recipe__thumb">
+                        <label for="recipe__thumb--inputEdit">Thumbnail Picture (URL)</label>
+                        <input class="recipe__thumb--input" id="recipe__thumb--inputEdit" type="text">
+                    </div>
+
             <form class="formIngredients" action="">
                 <form action="">
                     <div class="formIngredients__ingredientsChooser">
                         <label for="ingredientsChooser">Ingredients</label>
 
 
-                        <select class="js-example-basic-multiple" name="recipes[]" multiple="multiple" style="width: 100%">
+                        <select class="js-example-basic-multiple" name="recipes[]" multiple="multiple" id="ingredientsChooser" style="width: 100%">
 
                         </select>
 
@@ -213,10 +268,9 @@
                 </div>
 
 
-
-                <div class="recipe__media">
-                    <label for="media">Media</label>
-                    <input type="file">
+                <div class="recipe__tags">
+                    <label for="js-example-basic-multiple-tagsEdit">Tags</label>
+                    <select class="js-example-basic-multiple-tagsEdit" name="tags[]" multiple="multiple" id="js-example-basic-multiple-tagsEdit" style="width: 100%">  </select>
                 </div>
 
 
@@ -225,49 +279,100 @@
 
         <div class="container popup nodisplay ">
 
-
-
         </div>
 
-        <!-- Modal -->
+        <!-- Modals -->
         <div class="modal fade" id="myModal" role="dialog">
             <div class="modal-dialog">
 
                 <!-- Modal content-->
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Choose your Unit and Quantitys</h4>
-                    </div>
                     <div class="modal-body">
-                        <div class="recipe__ingredientsInfoPopup">
-                            <p class="recipe__ingredientsInfoPopup--name">ingredient</p>
-                            <div class="recipe__ingredientsInfoPopup--qtt">
-                                <label for="servingUnity">Quantity</label>
-                                <input id="servingUnityPopup" type="text">
-                            </div>
-                            <div class="recipe__ingredientsInfoPopup--unit">
-                                <label for="servingQuantity">Unit</label>
-                                <input id="servingQuantityPopup" type="text">
-                            </div>
+                        <div class="content">
+                                <a href="#" class="close__popupDelete" data-dismiss="modal"><span>&times;</span></a>  
+                                <h3 class="modal-title">Choose your Unit and Quantitys</h3>
+                                <p class="warningNotNumber nodisplay">You must select a number in quantity</p>
+                                <div class="recipe__ingredientsInfoPopup">
+                                    <p class="recipe__ingredientsInfoPopup--name">ingredient</p>
+                                    <img src="#" class="recipe__ingredientsPopup--url" alt="description of ingredient"></img>
+                                    <div class="recipe__ingredientsInfoPopup--qtt">
+                                        <label for="servingQuantityPopup">Quantity</label>
+                                        <input id="servingQuantityPopup" type="text">
+                                    </div>
+                                    <div class="recipe__ingredientsInfoPopup--unit">
+                                        <label for="servingUnityPopup">Unit</label>
+                                        <select id="servingUnityPopup">
+                                                <option value="litre(s)">litre(s)</option>
+                                                <option value="gram(s)">gram(s)</option>
+                                                <option value="piece(s)">piece(s)</option>
+                                                <option value="cup(s)">cup(s)</option>
+                                                <option value="teespoon(s)">teespoon(s)</option>
+                                            </select>
+                                    </div>
+                                </div>
+                                <a href="#" class="button saveIngredient">Add Ingredient</a>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="saveIngredient btn btn-default" data-dismiss="modal">Save</button>
+                        
                     </div>
                 </div>
 
             </div>
         </div>
 
+        <div class="modal fade" id="myModalSave" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="content">
+                                <div class="icon">
+                                        <span class="check glyphicon glyphicon-ok"></span>
+                                    </div>
+                                    <h3>Saved!</h3>
+                                    <a href="#" class="button" data-dismiss="modal">Ok</a>
+                        </div>
+                        
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="modal fade" id="myModalDelete" role="dialog">
+                <div class="modal-dialog">
+    
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="content">
+                                    
+                                        <h3>Are you sure you want to Delete this recipe ?</h3>
+                                        <div class="buttons__delete">
+                                                <a href="#" class="button recipe_delete" >Yes</a>
+                                                <a href="#" class="button" data-dismiss="modal">No</a>
+                                        </div>
+                                        
+                            </div>
+                            
+                        </div>
+                    </div>
+    
+                </div>
+            </div>
+
     </main>
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script> 
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script>
     <!-- Select 2-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <!-- Magnific Popup core JS file -->
     <script src="js/jquery.magnific-popup.js"></script>
+    <script src="js/jquery.hotkeys.js"></script>
+    <script src="js/google-code-prettify/prettify.js"></script>
+    <script src="js/bootstrap-wysiwyg.js"></script>
+    <script src="js/summernote.js"></script>
     <script src="js/client.js"></script>
 </body>
 

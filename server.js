@@ -60,11 +60,13 @@ app.get('/api/select', (req, res) => {
     },
 
   }).then(response => {
-    console.log(response.data.common[0].photo);
+    console.log(response.data.common[0].photo.thumb);
     res.json({
       results: response.data.common.map(ingredient => ({
         id: ingredient.tag_id,
-        text: ingredient.food_name
+        text: ingredient.food_name,
+        thumb: ingredient.photo.thumb
+
       }))
     });
   }).catch(
@@ -77,15 +79,17 @@ app.get('/api/select', (req, res) => {
 
 });
 
-//get the last 3 recipes
+//get all recipes
 
 app.get('/recipes', passport.authenticate('jwt', {
   session: false
 }), (req, res) => {
-  console.log("here");
+  console.log("get recipes");
   Recipe
     .find({
       author: req.user
+    }).sort({
+      created: -1
     })
     .then(recipes => {
       res.json(recipes);
@@ -97,6 +101,112 @@ app.get('/recipes', passport.authenticate('jwt', {
       });
     });
 })
+
+//get filtered recipes
+
+app.get('/filteredRecipes', passport.authenticate('jwt', {
+  session: false
+}), (req, res) => {
+  console.log(req.query);
+  const query = { author: req.user};
+  if(req.query.tagsSelected){
+    query.tags = {$all: req.query.tagsSelected };
+  }
+  if(req.query.ingsSelected){
+    query["ingredients.name"] = {$all: req.query.ingsSelected };
+  }
+  
+  Recipe
+    .find(query)
+    .then(recipes => {
+
+      res.json(recipes);
+  
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({
+        error: 'something went terribly wrong'
+      });
+    });
+})
+
+//get all Ingredients
+app.get('/allIngs',passport.authenticate('jwt', {
+  session: false
+}), (req, res) => {
+  Recipe
+  .find({
+    author: req.user
+  }).then(recipes => {
+    let ingredientsArray = [];
+    results: recipes.map(recipe => {
+      return recipe.ingredients;
+    }).forEach( recipeIngredients => {
+        
+      recipeIngredients.forEach(ingredient => {
+        let existsIng = ingredientsArray.find(ingarr => {
+          return ingarr === ingredient.name;
+        })
+        if(!existsIng)
+        ingredientsArray.push(ingredient.name);
+      })
+    })
+    res.json({results: ingredientsArray.map((index) => ({
+      id: index, 
+      text: index
+    }))
+    });
+  }).catch(err => {
+      console.error(err);
+      res.status(500).json({
+        error: 'something went horribly awry'
+      });
+    });
+});
+
+// get all Tags
+
+app.get('/allTags',passport.authenticate('jwt', {
+  session: false
+}), (req, res) => {
+  Recipe
+  .find({
+    author: req.user
+  }).then(recipes => {
+    console.log(recipes);
+
+    let tagsArray = [];
+    results: recipes.map(recipe => {
+      return recipe.tags;
+    }).forEach( recipeTags => {
+
+      if(recipeTags !== null){
+        recipeTags.forEach(tag => {
+
+          let existsTag = tagsArray.find(tagarr => {
+            return tagarr === tag;
+          })
+          if(!existsTag)
+            tagsArray.push(tag);
+        })
+
+      }
+        
+      
+    })
+    res.json({results: tagsArray.map((index) => ({
+      id: index, 
+      text: index
+    }))
+    });
+  }).catch(err => {
+      console.error(err);
+      res.status(500).json({
+        error: 'something went horribly awry'
+      });
+    });
+});
 
 // get one recipe based on id
 app.get('/recipes/:id', (req, res) => {
@@ -129,8 +239,11 @@ app.post('/recipes', passport.authenticate('jwt', {
   Recipe
     .create({
       title: req.body.title,
+      description: req.body.description,
+      url: req.body.url,
       instructions: req.body.instructions,
       ingredients: req.body.ingredients,
+      tags: req.body.tags,
       author: req.user
 
     })
@@ -200,6 +313,7 @@ app.delete('/recipes/:id', passport.authenticate('jwt', {
 app.put('/recipes/:id', passport.authenticate('jwt', {
   session: false
 }), (req, res) => {
+  console.log(req.body);
   if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
     res.status(400).json({
       error: 'Request path id and request body id values must match'
@@ -207,7 +321,7 @@ app.put('/recipes/:id', passport.authenticate('jwt', {
   }
 
   const updated = {};
-  const updateableFields = ['title', 'instructions', 'ingredients'];
+  const updateableFields = ['title','description', 'url', 'instructions', 'ingredients','tags'];
   updateableFields.forEach(field => {
     if (field in req.body) {
       updated[field] = req.body[field];

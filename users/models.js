@@ -19,9 +19,6 @@ email: {
     required: true
   },
 
-  recipes: {
-      type: Array,
-  }
 });
 
 UserSchema.methods.serialize = function() {

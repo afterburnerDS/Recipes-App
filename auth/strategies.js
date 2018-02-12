@@ -53,7 +53,7 @@ const jwtStrategy = new JwtStrategy(
     algorithms: ['HS256']
   },
   (payload, done) => {
-    User.findById(payload.user.id)
+    User.findById(payload.user._id)
     .then(
         user => {
           done(null,user);

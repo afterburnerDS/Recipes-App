@@ -4,15 +4,22 @@ const mongoose = require('mongoose');
 
 const recipeSchema = mongoose.Schema({
   title: { type: String, required: true },
+  description: { type: String },
+  url: {type: String},
   instructions: { type: String },
   ingredients: [
     { name: String,
+      thumb: String,
   quantity: Number,
   unit: String,}
   ],
+  tags : [
+    { type: String}
+  ],
   author: {
     type: mongoose.Schema.Types.ObjectId, ref: 'User'
-  }
+  },
+  created: { type: Date, default: Date.now }
 });
 
 
