@@ -745,6 +745,7 @@ function getListRecpipes() {
         type: 'GET',
         url: `http://localhost:3000/recipes/`,
         beforeSend: function (xhr) {
+            console.log(localStorage.token);
             if (localStorage.token) {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
             }
@@ -891,8 +892,10 @@ function handleSignup() {
                     $('.alreadyRegisteredUser').addClass('nodisplay');
                 },
                 error: function (data) {
-                    $('.alreadyRegisteredUser').removeClass('nodisplay');
-                }
+                    const err = JSON.parse(data.responseText);
+                    console.log(data.responseText);
+                    $('.alreadyRegisteredUser').text(err.message);
+                } 
             }
 
         ).then(data => {

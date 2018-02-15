@@ -1,8 +1,11 @@
 'use strict';
+global.DATABASE_URL = 'mongodb://127.0.0.1:27017/recipes-test';
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 const faker = require('faker');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config');
 const { createAuthToken } = require('../auth/router');
 
 // this makes the should syntax available throughout
@@ -71,17 +74,12 @@ function seedRecipeData(user) {
 }
 
 function seedUserData() {
-  console.info('seeding recipes data');
-  const seedData = [];
-  for (let i = 1; i <= 10; i++) {
-    seedData.push({
+  console.info('seeding user data');
+  return User.create({
       name: faker.name.findName(),
-     email: faker.internet.email(),
-     password: faker.lorem.sentence(),
+      email: faker.internet.email(),
+      password: faker.internet.password(),
     });
-  }
-  // this will return a promise
-  return User.insertMany(seedData);
 }
 
 describe('test recipes APP resource', function () {
@@ -91,12 +89,10 @@ describe('test recipes APP resource', function () {
   });
 
   beforeEach(function () {
-    return seedUserData().then(users => {
-      return seedRecipeData(users[0]);
-    }).then(recipes => {
-      console.log(recipes);
-    })
-    
+    return seedUserData()
+      .then(user => {
+        return seedRecipeData(user)
+      })
   });
 
   afterEach(function () {
@@ -112,62 +108,63 @@ describe('test recipes APP resource', function () {
   let res;
 
   describe('POST login', function(){
-    const password = faker.lorem.sentence();
-    return User.create (
-      {
-        name: faker.lorem.sentence(),
-     email: faker.lorem.word(),
-     password: password,
-      }
-    ).then(user => {
-      return chai.request(app)
-      .post('/api/auth/login')
-      .send({
-        email: user.email, 
-        password: user.password})
-      .then(_res => {
-        res = _res;
+    it('should login', function(){
+      const userdata = {
+        name: faker.name.findName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      };
+      User.hashPassword(userdata.password)
+        .then(hash => User.create({...userdata, password: hash}))
+        .then(user => chai.request(app)
+          .post('/api/auth/login')
+          .send({email: userdata.email, password: userdata.password})
+        )
+        .then(_res => {
+          res = _res;
           res.should.have.status(200);
-          jwt.verify(res.body.authToken, JWT_SECRET).should.be.true;
-          
-      })
+          jwt.verify(res.body.authToken, JWT_SECRET).should.be.an('Object');
+        })
     })
   });
 
   describe('POST Signup', function() {
+    it('should signup', function(){
 
-    const newUser = {
-      name: faker.lorem.sentence(),
-      email: faker.lorem.word(),
-      password: faker.lorem.sentence(),
+      const userdata = {
+        name: faker.name.findName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
       };
+
+      let created;
 
       return chai.request(app)
         .post('/api/users/')
-        .send(newUser)
+        .send(userdata)
         .then(function (res) {
           res.should.have.status(201);
           res.should.be.json;
-          res.body.should.be.a('object');
-          res.body.should.include.keys(
-            'id', 'name', 'email');
-          res.body.name.should.equal(newUser.name);
+          created = res.body;
+          created.should.be.a('object');
+          created.should.include.keys('id', 'name', 'email');
+          created.name.should.equal(userdata.name);
+          created.email.should.equal(userdata.email);
           // cause Mongo should have created id on insertion
-          res.body.id.should.not.be.null;
-          res.body.email.should.equal(newUser.email);
-          return User.findById(res.body.id);
+          created.id.should.not.be.null;
+          return User.findById(created.id);
         })
         .then(function (user) {
-          user.id.should.equal(newUser.id);
-          user.name.should.equal(newUser.name);
-          user.email.should.equal(newUser.email);
-          
+          created.id.should.equal(user.id);
+          created.name.should.equal(user.name);
+          created.email.should.equal(user.email);
         });
+    })
   })
 
   describe('GET recipes from user endpoint', function () {
 
-    it.only('should return all existing recipes', function () {
+    it('should return all existing recipes', function () {
       // strategy:
       //    1. get back all posts returned by by GET request to `/posts`
       //    2. prove res has right status, data type
@@ -177,28 +174,24 @@ describe('test recipes APP resource', function () {
       let token;
       return User.findOne()
       .then(user => {
-     
         token = createAuthToken(user);
-       
         return chai.request(app)
         .get('/recipes')
         .set('Authorization',`Bearer ${token}`)
-        .then(_res => {
-          res = _res;
-          res.should.have.status(200);
-          // otherwise our db seeding didn't work
-          res.body.should.have.length.of.at.least(1);
-
-          return Recipe.count();
-        })
-        .then(count => {
-          // the number of returned posts should be same
-          // as number of posts in DB
-          res.body.should.have.length.of(count);
-        });
-
       })
-     
+      .then(_res => {
+        res = _res;
+        res.should.have.status(200);
+        // otherwise our db seeding didn't work
+        res.body.should.have.lengthOf.at.least(1);
+
+        return Recipe.count();
+      })
+      .then(count => {
+        // the number of returned posts should be same
+        // as number of posts in DB
+        res.body.should.have.lengthOf(count);
+      });
     });
 
     it('should return recipes right fields', function () {
@@ -214,7 +207,6 @@ describe('test recipes APP resource', function () {
         .get('/recipes')
         .set('Authorization',`Bearer ${token}`)
         .then(function (res) {
-
           res.should.have.status(200);
           res.should.be.json;
           res.body.should.be.a('array');
@@ -222,18 +214,20 @@ describe('test recipes APP resource', function () {
 
           res.body.forEach(function (recipe) {
             recipe.should.be.a('object');
-            post.should.include.keys('id', 'title', 'instructions', 'ingredients', 'author');
+            recipe.should.include.keys('_id', 'title', 'instructions', 'ingredients', 'author');
           });
           // just check one of the posts that its values match with those in db
           // and we'll assume it's true for rest
           resRecipe = res.body[0];
-          return Recipe.findById(resRecipe.id);
+          return Recipe.findById(resRecipe._id);
         })
         .then(recipe => {
-          resRecipe.title.should.equal(recipe.title);
-          resRecipe.instructions.should.equal(recipe.content);
-          resRecipe.ingredients.should.equal(recipe.ingredients);
-          resRecipe.author.should.equal(recipe.author);
+          const data = recipe;
+          resRecipe.title.should.equal(data.title);
+          resRecipe.instructions.should.equal(data.instructions);
+          resRecipe.ingredients.should.deep.equal(
+            data.ingredients.map(i => ({...i.toObject(), _id: i._id.toString()})));
+          resRecipe.author.should.equal(data.author.toString());
         });
     });
   });
@@ -267,7 +261,7 @@ describe('test recipes APP resource', function () {
       let token;
       return User.findOne()
       .then(user => {
-        token = createAuthToken(user);
+        token = createAuthToken(user.serialize());
       return chai.request(app)
         .post('/recipes')
         .set('Authorization',`Bearer ${token}`)
@@ -298,7 +292,7 @@ describe('test recipes APP resource', function () {
     //  1. Get an existing post from db
     //  2. Make a PUT request to update that post
     //  4. Prove post in db is correctly updated
-    it('should update fields you send over', function () {
+    it.only('should update fields you send over', function () {
       const updateData = {
         title: 'chicken nuggets',
         instructions: 'fry the nuggets',
@@ -315,18 +309,19 @@ describe('test recipes APP resource', function () {
         },
       ]
       };
-     
+
       return Recipe
         .findOne()
         .then(recipe => {
-          updateData.id = recipe.id;
+          updateData.id = recipe._id;
           let token;
           return User.findOne()
           .then(user => {
-            token = createAuthToken(user);
+            token = createAuthToken(user.serialize());
           return chai.request(app)
-          .set('Authorization',`Bearer ${token}`)
-            .put(`/recipes/${recipe.id}`)
+          
+            .put(`/recipes/${recipe._id}`)
+            .set('Authorization',`Bearer ${token}`)
             .send(updateData);
         })
         .then(res => {
@@ -336,7 +331,11 @@ describe('test recipes APP resource', function () {
         .then(recipe => {
           recipe.title.should.equal(updateData.title);
           recipe.instructions.should.equal(updateData.instructions);
-          recipe.ingredients.should.equal(updateData.ingredients);
+          // recipe.ingredients.should.equal(updateData.ingredients);
+          updateData.ingredients.should.deep.equal(
+            recipe.ingredients.map(i => i.toObject())
+          );
+          // resRecipe.author.should.equal(data.author.toString());
         });
     });
   });
@@ -356,19 +355,28 @@ describe('DELETE endpoint', function () {
       .findOne()
       .then(_recipe => {
         recipe = _recipe;
-        return chai.request(app).delete(`/recipes/${post.id}`);
+        let token;
+        return User.findOne()
+        .then(user => {
+        token = createAuthToken(user);
+        return chai.request(app)
+        .delete(`/recipes/${recipe._id}`)
+        .set('Authorization',`Bearer ${token}`);
+        })
+        .then(res => {
+          res.should.have.status(204);
+          return Recipe.findById(recipe.id);
+        })
+        .then(_recipe => {
+          // when a variable's value is null, chaining `should`
+          // doesn't work. so `_post.should.be.null` would raise
+          // an error. `should.be.null(_post)` is how we can
+          // make assertions about a null value.
+          should.not.exist(_recipe);
+        });
       })
-      .then(res => {
-        res.should.have.status(204);
-        return Recipe.findById(recipe.id);
-      })
-      .then(_recipe => {
-        // when a variable's value is null, chaining `should`
-        // doesn't work. so `_post.should.be.null` would raise
-        // an error. `should.be.null(_post)` is how we can
-        // make assertions about a null value.
-        should.not.exist(_recipe);
-      });
+      
+     
   });
 });
 
@@ -383,8 +391,6 @@ describe('DELETE endpoint', function () {
           .get('/')
           .then(function(res) {
             expect(res).to.have.status(200);
-            
+
           });
       });
- 
-

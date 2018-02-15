@@ -78,6 +78,20 @@ p{
     margin-top: 2rem;
 }
 
+.content_mainPage{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.loginButton{
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    font-size: 1.5rem;
+}
+
 /********************************************************
 BUTTONS
 ********************************************************/

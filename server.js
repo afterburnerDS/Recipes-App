@@ -5,29 +5,16 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const passport = require('passport');
-const {
-  Strategy: LocalStrategy
-} = require('passport-local');
+const { Strategy: LocalStrategy } = require('passport-local');
 const app = express();
 
-const {
-  router: usersRouter
-} = require('./users');
-const {
-  router: authRouter,
-  localStrategy,
-  jwtStrategy
-} = require('./auth');
+const { router: usersRouter } = require('./users');
+const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
 
 mongoose.Promise = global.Promise;
 
-const {
-  PORT,
-  DATABASE_URL
-} = require('./config');
-const {
-  Recipe
-} = require('./models');
+const { PORT, DATABASE_URL } = require('./config');
+const { Recipe } = require('./models');
 
 app.use(morgan('dev'));
 app.use(cors());
@@ -60,7 +47,6 @@ app.get('/api/select', (req, res) => {
     },
 
   }).then(response => {
-    console.log(response.data.common[0].photo.thumb);
     res.json({
       results: response.data.common.map(ingredient => ({
         id: ingredient.tag_id,
@@ -75,7 +61,6 @@ app.get('/api/select', (req, res) => {
       res.sendStatus(500);
     }
   )
-  console.log(req.query);
 
 });
 
@@ -84,7 +69,6 @@ app.get('/api/select', (req, res) => {
 app.get('/recipes', passport.authenticate('jwt', {
   session: false
 }), (req, res) => {
-  console.log("get recipes");
   Recipe
     .find({
       author: req.user
@@ -107,7 +91,6 @@ app.get('/recipes', passport.authenticate('jwt', {
 app.get('/filteredRecipes', passport.authenticate('jwt', {
   session: false
 }), (req, res) => {
-  console.log(req.query);
   const query = { author: req.user};
   if(req.query.tagsSelected){
     query.tags = {$all: req.query.tagsSelected };
@@ -115,13 +98,13 @@ app.get('/filteredRecipes', passport.authenticate('jwt', {
   if(req.query.ingsSelected){
     query["ingredients.name"] = {$all: req.query.ingsSelected };
   }
-  
+
   Recipe
     .find(query)
     .then(recipes => {
 
       res.json(recipes);
-  
+
     })
     .catch(err => {
       console.error(err);
@@ -135,6 +118,7 @@ app.get('/filteredRecipes', passport.authenticate('jwt', {
 app.get('/allIngs',passport.authenticate('jwt', {
   session: false
 }), (req, res) => {
+  const term = req.query.term;
   Recipe
   .find({
     author: req.user
@@ -143,7 +127,7 @@ app.get('/allIngs',passport.authenticate('jwt', {
     results: recipes.map(recipe => {
       return recipe.ingredients;
     }).forEach( recipeIngredients => {
-        
+
       recipeIngredients.forEach(ingredient => {
         let existsIng = ingredientsArray.find(ingarr => {
           return ingarr === ingredient.name;
@@ -153,7 +137,7 @@ app.get('/allIngs',passport.authenticate('jwt', {
       })
     })
     res.json({results: ingredientsArray.map((index) => ({
-      id: index, 
+      id: index,
       text: index
     }))
     });
@@ -174,7 +158,6 @@ app.get('/allTags',passport.authenticate('jwt', {
   .find({
     author: req.user
   }).then(recipes => {
-    console.log(recipes);
 
     let tagsArray = [];
     results: recipes.map(recipe => {
@@ -192,11 +175,11 @@ app.get('/allTags',passport.authenticate('jwt', {
         })
 
       }
-        
-      
+
+
     })
     res.json({results: tagsArray.map((index) => ({
-      id: index, 
+      id: index,
       text: index
     }))
     });
@@ -225,7 +208,6 @@ app.get('/recipes/:id', (req, res) => {
 app.post('/recipes', passport.authenticate('jwt', {
   session: false
 }), (req, res) => {
-  console.log(req.body);
   const requiredFields = ['title', 'instructions', 'ingredients'];
   for (let i = 0; i < requiredFields.length; i++) {
     const field = requiredFields[i];
@@ -280,10 +262,6 @@ app.delete('/recipes/:id', passport.authenticate('jwt', {
   Recipe
     .findById(req.params.id)
     .then(recipe => {
-      console.log(recipe.author);
-      console.log(req.user._id);
-      // console.log(Recipe);
-
 
       if (recipe.author.toString() === req.user._id.toString()) {
 
@@ -313,7 +291,6 @@ app.delete('/recipes/:id', passport.authenticate('jwt', {
 app.put('/recipes/:id', passport.authenticate('jwt', {
   session: false
 }), (req, res) => {
-  console.log(req.body);
   if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
     res.status(400).json({
       error: 'Request path id and request body id values must match'
@@ -331,9 +308,6 @@ app.put('/recipes/:id', passport.authenticate('jwt', {
   Recipe
     .findById(req.params.id)
     .then(recipe => {
-      console.log(recipe.author);
-      console.log(req.user._id);
-      // console.log(Recipe);
 
 
       if (recipe.author.toString() === req.user._id.toString()) {
@@ -363,9 +337,7 @@ let server;
 // this function connects to our database, then starts the server
 function runServer(databaseUrl = DATABASE_URL, port = PORT) {
   return new Promise((resolve, reject) => {
-    mongoose.connect(databaseUrl, {
-      useMongoClient: true
-    }, err => {
+    mongoose.connect(databaseUrl, { }, err => {
       if (err) {
         return reject(err);
       }

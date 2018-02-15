@@ -8,14 +8,12 @@ const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const { User } = require('../users/models');
 const { JWT_SECRET } = require('../config');
 
-const localStrategy = new LocalStrategy({
-  usernameField : 'email'
-},( email, password, callback) => {
-  console.log("here");
-  let user;
+const localStrategy = new LocalStrategy(
+  { usernameField : 'email' },
+  ( email, password, callback) => {
+    let user;
   User.findOne({ email: email })
     .then(_user => {
-      console.log("here");
       user = _user;
       if (!user) {
         // Return a rejected promise so we break out of the chain of .thens.
@@ -53,7 +51,8 @@ const jwtStrategy = new JwtStrategy(
     algorithms: ['HS256']
   },
   (payload, done) => {
-    User.findById(payload.user._id)
+    console.log(payload);
+    User.findById(payload.user.id)
     .then(
         user => {
           done(null,user);

@@ -2,16 +2,20 @@
 
 const mongoose = require('mongoose');
 
+const ingSchema = mongoose.Schema(
+  {name: String,
+  thumb: String,
+quantity: Number,
+unit: String },
+{ _id : false});
+
 const recipeSchema = mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
   url: {type: String},
   instructions: { type: String },
   ingredients: [
-    { name: String,
-      thumb: String,
-  quantity: Number,
-  unit: String,}
+    ingSchema 
   ],
   tags : [
     { type: String}
