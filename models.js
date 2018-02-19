@@ -14,9 +14,7 @@ const recipeSchema = mongoose.Schema({
   description: { type: String },
   url: {type: String},
   instructions: { type: String },
-  ingredients: [
-    ingSchema 
-  ],
+  ingredients: [ingSchema],
   tags : [
     { type: String}
   ],

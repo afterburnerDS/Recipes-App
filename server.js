@@ -129,11 +129,15 @@ app.get('/allIngs',passport.authenticate('jwt', {
     }).forEach( recipeIngredients => {
 
       recipeIngredients.forEach(ingredient => {
-        let existsIng = ingredientsArray.find(ingarr => {
-          return ingarr === ingredient.name;
-        })
-        if(!existsIng)
-        ingredientsArray.push(ingredient.name);
+
+        if(ingredient.name.includes(term)){
+          let existsIng = ingredientsArray.find(ingarr => {
+            return ingarr === ingredient.name;
+          })
+          if(!existsIng)
+          ingredientsArray.push(ingredient.name);
+        }
+      
       })
     })
     res.json({results: ingredientsArray.map((index) => ({
@@ -154,11 +158,14 @@ app.get('/allIngs',passport.authenticate('jwt', {
 app.get('/allTags',passport.authenticate('jwt', {
   session: false
 }), (req, res) => {
+  const term = req.query.term;
+  var regexp = new RegExp(term);
   Recipe
   .find({
-    author: req.user
+    author: req.user,
+    tags: regexp
   }).then(recipes => {
-
+    console.log(recipes);
     let tagsArray = [];
     results: recipes.map(recipe => {
       return recipe.tags;
@@ -167,11 +174,14 @@ app.get('/allTags',passport.authenticate('jwt', {
       if(recipeTags !== null){
         recipeTags.forEach(tag => {
 
+         if(tag.includes(term)){
           let existsTag = tagsArray.find(tagarr => {
             return tagarr === tag;
           })
           if(!existsTag)
             tagsArray.push(tag);
+         }
+         
         })
 
       }

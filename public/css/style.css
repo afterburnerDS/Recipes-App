@@ -104,6 +104,14 @@ BUTTONS
     transition: all .2s;
 }
 
+@media only screen and (max-width: 
+    550px) {
+        .button__admin {
+            padding: .5rem;
+            font-size: 1rem;
+        }
+    }
+
 .button__admin:focus
 
 {
@@ -127,6 +135,14 @@ BUTTONS
     box-shadow: 0rem 1rem 3rem rgba(0, 0, 0, .2); 
     transition: all .2s;
 }
+
+@media only screen and (max-width: 
+    550px) {
+        .button {
+            padding: .5rem;
+            font-size: 1rem;
+        }
+    }
 
 .button:focus{
     background-color: #4a322b;
@@ -494,6 +510,8 @@ margin-bottom: 3rem;
     margin-bottom: 2rem;
 }
 
+
+
 .recipe__buttons--back,
 .recipe__buttons--backEdit
 {
@@ -744,7 +762,7 @@ div.formIngredients__ingredientsChooser > span > span.selection > span{
     display:flex;
     justify-content:center;
     padding:2rem;
-    margin-bottom: 2rem;
+    /* margin-bottom: 2rem; */
 }
 
 @media only screen and (max-width: 
@@ -759,7 +777,7 @@ div.formIngredients__ingredientsChooser > span > span.selection > span{
     justify-content: flex-end;
     margin-bottom:2rem;
     flex-wrap: wrap;
-    padding:2rem;
+    padding:1rem;
    
     
 }
@@ -778,7 +796,7 @@ div.formIngredients__ingredientsChooser > span > span.selection > span{
     background-color: #D83B18;
     color: white;
     border-radius: 5%;
-    box-shadow: 0rem 1rem 2rem rgba(0, 0, 0, .1);
+    /* box-shadow: 0rem 1rem 2rem rgba(0, 0, 0, .1); */
 }
 
 .recipe__descriptionView{
@@ -913,6 +931,8 @@ div.formIngredients__ingredientsChooser > span > span.selection > span{
 ********************************************************/
 #myModalSave .modal-content,
 #myModalDelete .modal-content,
+#myModalNoTitle .modal-content,
+#myModalNoIngredients .modal-content,
 #myModal .modal-content{
     background: var(--color--quinternary) !important;
 }

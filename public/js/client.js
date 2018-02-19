@@ -8,7 +8,7 @@ function handleBack() {
     // comes back to current list of recipes of user
     $('.recipe__buttons--back').off('click');
     $('.recipe__buttons--back').on('click', function (event) {
-        console.log("back");
+
         getListRecpipes();
     });
 }
@@ -19,9 +19,7 @@ function handleBackEdit() {
     $('.recipe__buttons--backEdit').on('click', function (event) {
         
         getRecpipes();
-        
-        
-        
+          
     });
 }
 
@@ -43,7 +41,7 @@ function handleSaveRecipe() {
         //get all ingredients
 
         const ingredients = [];
-        // console.log($('recipe__ingredientsInfo'));
+        
 
         $('.recipe__ingredientsInfo--ingredient', currentPage).each(function (i, ingredient) {
             let ingredientObj = {
@@ -62,21 +60,12 @@ function handleSaveRecipe() {
             }
         });
 
-    
-
-        console.log(title);
-        console.log(description);
-        console.log(url);
-        
-        console.log(ingredients);
-        console.log(tags);
 
         // If id is defined, lets do edit instead
         if (idRecipe) {
             instructions = $('#recipe_instructionsEdit').summernote('code');
             tags = $('#js-example-basic-multiple-tagsEdit').val();
-            console.log(instructions);
-            console.log(tags);
+    
             $.ajax({
                  
                 type: 'PUT',
@@ -101,8 +90,6 @@ function handleSaveRecipe() {
                 }),
                 success: function (data) {
                     //show a popup saying saved
-                    // idRecipe = data.id;
-
                 },
                 error: function (data) {
 
@@ -145,10 +132,15 @@ function handleSaveRecipe() {
         }
 
         event.preventDefault();
+        if(!title ){
+            $('#myModalNoTitle').modal();
 
-        $('#myModalSave').modal();
+        }else {
+            $('#myModalSave').modal();
+        }
+      
     })
-    // handleBack();
+    
 }
 
 function handleEditRecipe(recipeToRender) {
@@ -156,7 +148,6 @@ function handleEditRecipe(recipeToRender) {
     $(".recipe__buttons--edit").off('click')
     $(".recipe__buttons--edit").on('click', function (event) {
         currentPage = $('.editRecipe');
-        console.log(data);
         //  idRecipe = recipeToRender.id;
         //unload other pages
         $('.content_mainPage').addClass("nodisplay");
@@ -180,7 +171,7 @@ function handleEditRecipe(recipeToRender) {
 
         });
 
-        $('.recipe__ingredientsInfo').html(recipeIngredientsArray.join(""));
+        $('.recipe__ingredientsInfo', currentPage).html(recipeIngredientsArray.join(""));
 
         recipeIngredients.forEach(function (ing) {
 
@@ -204,7 +195,8 @@ function handleEditRecipe(recipeToRender) {
                 },
                
             },
-            tags: true
+            tags: true,
+            minimumInputLength: 3
     
         });
         let i = 1;
@@ -240,7 +232,7 @@ function handleDeleteRecipe() {
         $('#myModalDelete').modal();
         $('.recipe_delete').off('click');
         $('.recipe_delete').on('click', function(event){
-            console.log(idRecipe);
+           
         if (idRecipe) {
 
             $.ajax({
@@ -255,19 +247,14 @@ function handleDeleteRecipe() {
                 },
 
                 url: `http://localhost:3000/recipes/${idRecipe}`,
-                // data: JSON.stringify({
-                //     id: idRecipe,
-                //     title: title,
-                //     instructions: instructions,
-                //     ingredients: ingredients
-                // }),
+              
                 success: function (data) {
                     //go back to list of recipes
                     getListRecpipes();
 
                 },
                 error: function (data) {
-                    console.log("no delete");
+                 
                 }
 
             });
@@ -320,8 +307,6 @@ function renderRecipeListIngredients(elem) {
                     </div>
                 </div>
              </div>`;
-
-
 }
 
 function renderRecipeListIngredientsEdit(elem, idRecipe) {
@@ -357,12 +342,10 @@ function renderRecipeListIngredientsEdit(elem, idRecipe) {
 function showViewRecipe(data, id) {
     //find the object
     currentPage = $('.viewRecipe');
-    console.log(data);
+  
     let recipeToRender = data.find(recipe => {
         return recipe._id === id;
     })
-
-    console.log(recipeToRender);
 
     //unload other pages
     $('.content_mainPage').addClass("nodisplay");
@@ -375,6 +358,19 @@ function showViewRecipe(data, id) {
 
     $('.recipe__titleView--value').text(recipeToRender.title);
     $('.recipe__descriptionView--desc').text(recipeToRender.description);
+    
+    if(!recipeToRender.description){
+        $('.recipe__descriptionView--desc').addClass("nodisplay");
+    }else {
+        $('.recipe__descriptionView--desc').removeClass("nodisplay");
+    }
+ 
+    if(recipeToRender.instructions ==="<p><br></p>" || recipeToRender.instructions === ""){
+        
+        $('.recipe__instructionsView--title').addClass("nodisplay");
+    }else{
+        $('.recipe__instructionsView--title').removeClass("nodisplay");
+    }
     $('.recipe__instructionsView--content').html(recipeToRender.instructions);
 
     
@@ -397,6 +393,15 @@ function showViewRecipe(data, id) {
 
         });
 
+        if(!recipeIngredients.length){
+
+            $('.recipe__ingredientsView--title').addClass("nodisplay");
+
+        }else{
+            $('.recipe__ingredientsView--title').removeClass("nodisplay");
+        }
+
+        
         $('.recipe__ingredientsView--info').html(recipeIngredientsArray.join(""));
     }
 
@@ -414,15 +419,12 @@ function handleClickRecipe(data) {
     //serve page of recipe
     $(".recipeContainer").on("click", function (event) {
         //get the id of the recipe
-        // console.log();
-
+    
         if ($(event.target).attr("class") === "recipeContainer__resume") {
             idRecipe = $(event.target).attr("data-recipeId");
         } else {
             idRecipe = $(event.target).parents(".recipeContainer__resume").attr("data-recipeId");
         }
-
-        console.log(data);
 
         //populate recipe fields
         currentPage = $('.viewRecipe');
@@ -431,7 +433,6 @@ function handleClickRecipe(data) {
 }
 
 function renderRecipeListRecipes(elem, index) {
-    console.log(elem);
     let newDesc = "";
     let newTitle = "";
        let ingredients = elem.ingredients.map(ingredient => {
@@ -505,7 +506,6 @@ function renderRecipeListRecipes(elem, index) {
 }
 
 function generateListRecipes(data) {
-    console.log("aqui");
     let items = data.map(function (elem, index) {
         return renderRecipeListRecipes(elem, index);
 
@@ -514,7 +514,7 @@ function generateListRecipes(data) {
 }
 
 function showListRecipes(data) {
-    console.log("auqi");
+
     //Show list of recipes
 
     $('.content_mainPage').addClass("nodisplay");
@@ -537,14 +537,14 @@ function showListRecipes(data) {
     $('#js-example-basic-multiple-filterbyTag').off('select2:select	');
     $('#js-example-basic-multiple-filterbyTag').on('select2:select	', function (e) {
 
-        console.log("cheguei ao filtro");
+     
         getFilteredRecipes();
     });
 
     $('#js-example-basic-multiple-filterbyTag').off('select2:unselect	');
     $('#js-example-basic-multiple-filterbyTag').on('select2:unselect	', function (e) {
 
-        console.log("cheguei ao filtro");
+      
         getFilteredRecipes();
     });
 
@@ -566,9 +566,6 @@ function getFilteredRecipes() {
     let tagsSelected = $('#js-example-basic-multiple-filterbyTag').val();
     let ingsSelected = $('#js-example-basic-multiple-filterbyIng').val();
 
-    console.log(tagsSelected);
-    console.log(ingsSelected);
-
     $.ajax({
         type: 'GET',
         url: `http://localhost:3000/filteredRecipes/`,
@@ -586,7 +583,6 @@ function getFilteredRecipes() {
         },
 
         success: function (recipes) {
-            console.log(recipes);
             data = recipes;
             // bring the recipes from the user
             $('.login-register-form').modal('hide');
@@ -595,9 +591,6 @@ function getFilteredRecipes() {
             // show his list of recipes
             showListRecipes(data);
             $('.signout').removeClass("nodisplay");
-
-
-            // alert('Hello ' + data.name + '! You have successfully accessed to /api/profile.');
 
         },
         error: function () {
@@ -635,12 +628,9 @@ function handleNewIngredients() {
         $('.saveIngredient').off('click');
         $('.saveIngredient').on('click', event => {
             //get the qtt, unit
-        
-            console.log("save click");
+             
             let qtt = $('#servingQuantityPopup').val();
             let unit = $('#servingUnityPopup').val();
-
-            console.log(isNumber(qtt) );
 
             if(isNumber(qtt)){
                 let ingredientToBeRendered = function renderIngredient() {
@@ -669,21 +659,15 @@ function handleNewIngredients() {
                      </div>
                      </div>
                  </div>`;
+                }
                      
-                     }
-
-                     // currentPage.find('.recipe__ingredientsInfoNew').append(ingredientToBeRendered);
 
             $('.recipe__ingredientsInfo', currentPage).append(ingredientToBeRendered);
 
             $(`#servingUnity${name}New option`, currentPage).prop('selected', false).filter(function() {
-                console.log($(this));
                 return $(this).text() == unit;  
             }).prop('selected', true);
 
-            // $('.recipe__ingredientsInfo--ingredient', currentPage).each(function (i, ingredient) {
-            //     console.log(ingredient);
-            // });
 
             $('#myModal').modal('hide');
             $('body').removeClass('modal-open');
@@ -745,7 +729,6 @@ function getListRecpipes() {
         type: 'GET',
         url: `http://localhost:3000/recipes/`,
         beforeSend: function (xhr) {
-            console.log(localStorage.token);
             if (localStorage.token) {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
             }
@@ -760,8 +743,6 @@ function getListRecpipes() {
             showListRecipes(data);
             $('.signout').removeClass("nodisplay");
 
-
-            // alert('Hello ' + data.name + '! You have successfully accessed to /api/profile.');
         },
         error: function () {
             alert("Sorry, you are not logged in.");
@@ -780,9 +761,8 @@ function getRecpipes() {
         },
         success: function (recipes) {
             data = recipes;
-            console.log(data);
             showViewRecipe(data,idRecipe);
-            // alert('Hello ' + data.name + '! You have successfully accessed to /api/profile.');
+            
         },
         error: function () {
             alert("Sorry, you are not logged in.");
@@ -800,7 +780,6 @@ function handleLogin() {
         //validate user information
         const email = $('#email').val();
         const pwd = $('#pwd').val();
-        console.log(email + pwd);
         //creates token for the user
         $.ajax(
 
@@ -821,7 +800,6 @@ function handleLogin() {
                 //saves it in localstorage
                 success: function (data) {
                     localStorage.token = data.authToken;
-                    console.log('Got a token from the server! Token: ' + data.authToken);
                     $('.nonExistingUser').addClass("nodisplay");
                 },
                 error: function (data) {
@@ -832,7 +810,6 @@ function handleLogin() {
 
         ).then(data => {
 
-            console.log();
             // bring the recipes from the user
             getListRecpipes();
 
@@ -866,7 +843,6 @@ function handleSignup() {
         const newName = $('#name').val();
         const newEmail = $('#newemail').val();
         const newPwd = $('#newpwd').val();
-        console.log(newName + newEmail + newPwd);
         //creates token for the user
         $.ajax(
 
@@ -893,7 +869,6 @@ function handleSignup() {
                 },
                 error: function (data) {
                     const err = JSON.parse(data.responseText);
-                    console.log(data.responseText);
                     $('.alreadyRegisteredUser').text(err.message);
                 } 
             }
@@ -929,15 +904,11 @@ function handleSignup() {
 
             ).then(data => {
 
-                console.log();
                 // bring the recipes from the user
                 getListRecpipes();
 
             })
-
         })
-
-
     })
 
     // create new entry in user database
@@ -969,10 +940,6 @@ function handleNewImage() {
     });
 }
 
-
-
-
-
 function init() {
     $('.js-example-basic-multiple').select2({
 
@@ -988,7 +955,7 @@ function init() {
     });
 
     function formatIngredient(ingredient) {
-        // console.log(ingredient);
+
         if (ingredient.loading) {
             return ingredient.text;
         }
@@ -1004,10 +971,7 @@ function init() {
                 </div>
             </div>
         </div>`;
-
-
-
-        return markup;
+       return markup;
     }
 
     function formatIngSelection(ingredient) {
@@ -1024,7 +988,7 @@ function init() {
             },
            
         },
-        
+        minimumInputLength: 3,
 
     });
 
@@ -1038,20 +1002,19 @@ function init() {
             }
            
         },
+        minimumInputLength: 3,
 
     });
 
     $('#instructions').summernote();
     $('#recipe_instructionsEdit').summernote();
     delete $.summernote.options.keyMap.pc.TAB;
-delete $.summernote.options.keyMap.mac.TAB;
+    delete $.summernote.options.keyMap.mac.TAB;
 
     
     //serve the login page
     handleLogin();
     handleSignup();
-
-    //showRecipes();
 
 }
 
