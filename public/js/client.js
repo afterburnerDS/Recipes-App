@@ -865,10 +865,12 @@ function handleSignup() {
                 success: function (data) {
                     // localStorage.token = data.authToken;
                     // alert('Got a token from the server! Token: ' + data.authToken);
-                    $('.alreadyRegisteredUser').addClass('nodisplay');
+                    $('.alreadyRegisteredUser').text("");
                 },
                 error: function (data) {
+                  
                     const err = JSON.parse(data.responseText);
+                    console.log(err.message);
                     $('.alreadyRegisteredUser').text(err.message);
                 } 
             }
