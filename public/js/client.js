@@ -237,7 +237,6 @@ function handleDeleteRecipe() {
             $.ajax({
                 type: 'DELETE',
 
-
                 beforeSend: function (xhr) {
                     if (localStorage.token) {
                         xhr.setRequestHeader("Content-Type", "application/json");
@@ -812,6 +811,38 @@ function handleLogin() {
         ).then(data => {
 
             // bring the recipes from the user
+            $("#js-example-basic-multiple-filterbyIng").select2('destroy');
+$("#js-example-basic-multiple-filterbyIng").html("<option></option>");
+$('#js-example-basic-multiple-filterbyIng').select2({
+    ajax: {
+        url: "/allIngs",
+        beforeSend: function (xhr) {
+            if (localStorage.token) {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
+            }
+        },
+       
+    },
+   
+
+});
+
+$("#js-example-basic-multiple-filterbyTag").select2('destroy');
+$("#js-example-basic-multiple-filterbyTag").html("<option></option>");
+
+$('#js-example-basic-multiple-filterbyTag').select2({
+    ajax: {
+        url: "/allTags",
+        beforeSend: function (xhr) {
+            if (localStorage.token) {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
+            }
+        }
+       
+    },
+    
+
+});
             getListRecpipes();
 
         })
@@ -992,7 +1023,7 @@ function init() {
            
         },
        
-
+    
     });
 
     $('#js-example-basic-multiple-filterbyTag').select2({
