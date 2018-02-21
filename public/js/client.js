@@ -707,9 +707,11 @@ function handleNewRecipe() {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
                     }
                 },
-                minimumInputLength: 3
+                
             },
             tags: true,
+            minimumInputLength: 3
+            
     
         });
         idRecipe = "";
