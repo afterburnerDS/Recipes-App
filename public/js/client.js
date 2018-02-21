@@ -196,7 +196,6 @@ function handleEditRecipe(recipeToRender) {
                
             },
             tags: true,
-            minimumInputLength: 3
     
         });
         let i = 1;
@@ -710,7 +709,6 @@ function handleNewRecipe() {
                 
             },
             tags: true,
-            minimumInputLength: 3
             
     
         });
@@ -992,7 +990,7 @@ function init() {
             },
            
         },
-        minimumInputLength: 3,
+       
 
     });
 
@@ -1006,7 +1004,7 @@ function init() {
             }
            
         },
-        minimumInputLength: 3,
+        
 
     });
 
