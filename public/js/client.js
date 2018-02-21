@@ -78,7 +78,7 @@ function handleSaveRecipe() {
                     }
                 },
 
-                url: `http://localhost:3000/recipes/${idRecipe}`,
+                url: `/recipes/${idRecipe}`,
                 data: JSON.stringify({
                     id: idRecipe,
                     title: title,
@@ -111,7 +111,7 @@ function handleSaveRecipe() {
                     }
                 },
 
-                url: `http://localhost:3000/recipes`,
+                url: `/recipes`,
                 data: JSON.stringify({
                     title: title,
                     description: description,
@@ -187,7 +187,7 @@ function handleEditRecipe(recipeToRender) {
         $("#js-example-basic-multiple-tagsEdit").empty().select2();
         $('#js-example-basic-multiple-tagsEdit').select2({
             ajax: {
-                url: "http://localhost:3000/allTags",
+                url: "/allTags",
                 beforeSend: function (xhr) {
                     if (localStorage.token) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
@@ -246,7 +246,7 @@ function handleDeleteRecipe() {
                     }
                 },
 
-                url: `http://localhost:3000/recipes/${idRecipe}`,
+                url: `/recipes/${idRecipe}`,
               
                 success: function (data) {
                     //go back to list of recipes
@@ -568,7 +568,7 @@ function getFilteredRecipes() {
 
     $.ajax({
         type: 'GET',
-        url: `http://localhost:3000/filteredRecipes/`,
+        url: `/filteredRecipes/`,
         beforeSend: function (xhr) {
             if (localStorage.token) {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
@@ -701,7 +701,7 @@ function handleNewRecipe() {
         $("#js-example-basic-multiple-tags").empty().select2();
         $('#js-example-basic-multiple-tags').select2({
             ajax: {
-                url: "http://localhost:3000/allTags",
+                url: "/allTags",
                 beforeSend: function (xhr) {
                     if (localStorage.token) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
@@ -727,7 +727,7 @@ function handleNewRecipe() {
 function getListRecpipes() {
     $.ajax({
         type: 'GET',
-        url: `http://localhost:3000/recipes/`,
+        url: `/recipes/`,
         beforeSend: function (xhr) {
             if (localStorage.token) {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
@@ -753,7 +753,7 @@ function getListRecpipes() {
 function getRecpipes() {
     $.ajax({
         type: 'GET',
-        url: `http://localhost:3000/recipes/`,
+        url: `/recipes/`,
         beforeSend: function (xhr) {
             if (localStorage.token) {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
@@ -788,7 +788,7 @@ function handleLogin() {
                 beforeSend: function (request) {
                     request.setRequestHeader("Content-Type", "application/json");
                 },
-                url: "http://localhost:3000/api/auth/login",
+                url: "/api/auth/login",
                 // email: email,
                 // pwd: pwd,
 
@@ -851,7 +851,7 @@ function handleSignup() {
                 beforeSend: function (request) {
                     request.setRequestHeader("Content-Type", "application/json");
                 },
-                url: "http://localhost:3000/api/users/",
+                url: "/api/users/",
 
 
                 data: JSON.stringify({
@@ -885,7 +885,7 @@ function handleSignup() {
                     beforeSend: function (request) {
                         request.setRequestHeader("Content-Type", "application/json");
                     },
-                    url: "http://localhost:3000/api/auth/login",
+                    url: "/api/auth/login",
                     // email: email,
                     // pwd: pwd,
 
@@ -946,7 +946,7 @@ function init() {
     $('.js-example-basic-multiple').select2({
 
         ajax: {
-            url: "http://localhost:3000/api/select",
+            url: "/api/select",
         },
         minimumInputLength: 3,
         escapeMarkup: function (markup) {
@@ -982,7 +982,7 @@ function init() {
 
     $('#js-example-basic-multiple-filterbyIng').select2({
         ajax: {
-            url: "http://localhost:3000/allIngs",
+            url: "/allIngs",
             beforeSend: function (xhr) {
                 if (localStorage.token) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
@@ -996,7 +996,7 @@ function init() {
 
     $('#js-example-basic-multiple-filterbyTag').select2({
         ajax: {
-            url: "http://localhost:3000/allTags",
+            url: "/allTags",
             beforeSend: function (xhr) {
                 if (localStorage.token) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
