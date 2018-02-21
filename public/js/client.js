@@ -697,6 +697,7 @@ function handleNewRecipe() {
         $('.recipe__description--input').val('');
         $('.recipe__thumb--input').val('');
         $('.recipe__ingredientsInfo').html('');
+        $('#instructions').summernote('code',"");
         $("#js-example-basic-multiple-tags").empty().select2();
         $('#js-example-basic-multiple-tags').select2({
             ajax: {
