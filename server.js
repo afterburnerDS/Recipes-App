@@ -129,8 +129,8 @@ app.get('/allIngs',passport.authenticate('jwt', {
     }).forEach( recipeIngredients => {
 
       recipeIngredients.forEach(ingredient => {
-
-        if(term !== "" || term !== " "){
+        
+        if(term){
           if(ingredient.name.includes(term)){
             let existsIng = ingredientsArray.find(ingarr => {
               return ingarr === ingredient.name;
@@ -185,15 +185,21 @@ app.get('/allTags',passport.authenticate('jwt', {
 
       if(recipeTags !== null){
         recipeTags.forEach(tag => {
-
-         if(tag.includes(term)){
-          let existsTag = tagsArray.find(tagarr => {
-            return tagarr === tag;
-          })
-          if(!existsTag)
-            tagsArray.push(tag);
-         }
-         
+          if(term){
+            if(tag.includes(term)){
+              let existsTag = tagsArray.find(tagarr => {
+                return tagarr === tag;
+              })
+              if(!existsTag)
+                tagsArray.push(tag);
+             }
+          }else{
+            let existsTag = tagsArray.find(tagarr => {
+              return tagarr === tag;
+            })
+            if(!existsTag)
+              tagsArray.push(tag);
+          }
         })
 
       }
