@@ -292,7 +292,7 @@ describe('test recipes APP resource', function () {
     //  1. Get an existing post from db
     //  2. Make a PUT request to update that post
     //  4. Prove post in db is correctly updated
-    it.only('should update fields you send over', function () {
+    it('should update fields you send over', function () {
       const updateData = {
         title: 'chicken nuggets',
         instructions: 'fry the nuggets',
