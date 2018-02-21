@@ -174,7 +174,7 @@ describe('test recipes APP resource', function () {
       let token;
       return User.findOne()
       .then(user => {
-        token = createAuthToken(user);
+        token = createAuthToken(user.serialize());
         return chai.request(app)
         .get('/recipes')
         .set('Authorization',`Bearer ${token}`)
@@ -202,7 +202,7 @@ describe('test recipes APP resource', function () {
       let token;
       return User.findOne()
       .then(user => {
-        token = createAuthToken(user);
+        token = createAuthToken(user.serialize());
         return chai.request(app)
         .get('/recipes')
         .set('Authorization',`Bearer ${token}`)
@@ -226,7 +226,7 @@ describe('test recipes APP resource', function () {
           resRecipe.title.should.equal(data.title);
           resRecipe.instructions.should.equal(data.instructions);
           resRecipe.ingredients.should.deep.equal(
-            data.ingredients.map(i => ({...i.toObject(), _id: i._id.toString()})));
+            data.ingredients.map(i => i.toObject()));
           resRecipe.author.should.equal(data.author.toString());
         });
     });
@@ -358,7 +358,7 @@ describe('DELETE endpoint', function () {
         let token;
         return User.findOne()
         .then(user => {
-        token = createAuthToken(user);
+        token = createAuthToken(user.serialize());
         return chai.request(app)
         .delete(`/recipes/${recipe._id}`)
         .set('Authorization',`Bearer ${token}`);
