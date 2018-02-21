@@ -130,13 +130,25 @@ app.get('/allIngs',passport.authenticate('jwt', {
 
       recipeIngredients.forEach(ingredient => {
 
-        if(ingredient.name.includes(term)){
+        if(term !== "" || term !== " "){
+          if(ingredient.name.includes(term)){
+            let existsIng = ingredientsArray.find(ingarr => {
+              return ingarr === ingredient.name;
+            })
+            if(!existsIng)
+            ingredientsArray.push(ingredient.name);
+          }
+
+        } else{
           let existsIng = ingredientsArray.find(ingarr => {
             return ingarr === ingredient.name;
           })
           if(!existsIng)
           ingredientsArray.push(ingredient.name);
+
         }
+
+        
       
       })
     })
