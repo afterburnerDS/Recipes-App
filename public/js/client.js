@@ -150,7 +150,7 @@ function handleEditRecipe(recipeToRender) {
         currentPage = $('.editRecipe');
         //  idRecipe = recipeToRender.id;
         //unload other pages
-        $('.content_mainPage').addClass("nodisplay");
+        $('.content_mainPage--secondary').addClass("nodisplay");
         $('.newRecipe').addClass("nodisplay");
         $('.viewRecipe').addClass("nodisplay");
         $('.listRecipes').addClass("nodisplay");
@@ -346,7 +346,7 @@ function showViewRecipe(data, id) {
     })
 
     //unload other pages
-    $('.content_mainPage').addClass("nodisplay");
+    $('.content_mainPage--secondary').addClass("nodisplay");
     $('.newRecipe').addClass("nodisplay");
     $('.editRecipe').addClass("nodisplay");
     $('.listRecipes').addClass("nodisplay");
@@ -515,7 +515,7 @@ function showListRecipes(data) {
 
     //Show list of recipes
 
-    $('.content_mainPage').addClass("nodisplay");
+    $('.content_mainPage--secondary').addClass("nodisplay");
     $('.newRecipe').addClass("nodisplay");
     $('.viewRecipe').addClass("nodisplay");
     $('.editRecipe').addClass("nodisplay");
@@ -857,7 +857,7 @@ function handleSignout() {
 
     $('.signout').on('click', function (event) {
 
-        $('.content_mainPage').removeClass("nodisplay");
+        $('.content_mainPage--secondary').removeClass("nodisplay");
         $('.newRecipe').addClass("nodisplay");
         $('.viewRecipe').addClass("nodisplay");
         $('.editRecipe').addClass("nodisplay");
